@@ -33,6 +33,11 @@ import java.util.Date
 data class OrdemServico(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
+    val largura: Float,
+    val altura: Float,
+    val valorM2: Float,
+    val quantidade: Int,
+    val valorUnitario: Float,
     val valorTotal: Float,
     val valorDesconto: Float,
     val valorAPagar: Float,

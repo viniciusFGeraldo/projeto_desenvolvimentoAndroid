@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
 import java.util.Date
 
 @Entity(
@@ -28,12 +29,6 @@ data class Produto(
     val id: Int,
     val nome: String,
     val descricao: String,
-    val largura: Float,
-    val altura: Float,
-    val valorM2: Float,
-    val quantidade: Int,
-    val valorUnitario: Float,
-    val valorSubTotal: Float,
     val criadoEm: Date = Date(),
 
     @ColumnInfo(name = "acabamentoId")
@@ -41,4 +36,18 @@ data class Produto(
 
     @ColumnInfo(name = "equipamentoId")
     val equipamentoId: Int
-)
+){
+
+    class DateConverter {
+
+        @TypeConverter
+        fun fromTimestamp(value: Long?): Date? {
+            return value?.let { Date(it) }
+        }
+
+        @TypeConverter
+        fun dateToTimestamp(date: Date?): Long? {
+            return date?.time
+        }
+    }
+}

@@ -25,7 +25,7 @@ class OrdemServicoViewModel(private val ordemServicoDao: OrdemServicoDao) : View
         }
     }
 
-    fun salvarOrdemServico(
+    fun salvarOrdemServico(largura: Float, altura:Float, valorM2: Float, quantidade: Int, valorUnitario: Float,
         valorTotal: Float, valorDesconto: Float, valorAPagar: Float, observacoes: String,
         status: Status, clienteId: Int, funcionarioId: Int, produtoId: Int
     ): String {
@@ -33,6 +33,11 @@ class OrdemServicoViewModel(private val ordemServicoDao: OrdemServicoDao) : View
 
         val ordemServico = OrdemServico(
             id = 0,
+            largura = largura,
+            altura = altura,
+            valorM2 = valorM2,
+            quantidade = quantidade,
+            valorUnitario = valorUnitario,
             valorTotal = valorTotal,
             valorDesconto = valorDesconto,
             valorAPagar = valorAPagar,
@@ -60,13 +65,19 @@ class OrdemServicoViewModel(private val ordemServicoDao: OrdemServicoDao) : View
     }
 
     fun atualizarOrdemServico(
-        id: Int, valorTotal: Float, valorDesconto: Float, valorAPagar: Float, observacoes: String,
+        id: Int, largura: Float, altura:Float, valorM2: Float, quantidade: Int, valorUnitario: Float,
+        valorTotal: Float, valorDesconto: Float, valorAPagar: Float, observacoes: String,
         status: Status, clienteId: Int, funcionarioId: Int, produtoId: Int
     ): String {
 
         val ordemServico = listaOrdemServico.value.find { it.id == id } ?: return "Erro ao atualizar ordem de serviço"
 
         val ordemServicoAtualizada = ordemServico.copy(
+            largura = largura,
+            altura = altura,
+            valorM2 = valorM2,
+            quantidade = quantidade,
+            valorUnitario = valorUnitario,
             valorTotal = valorTotal,
             valorDesconto = valorDesconto,
             valorAPagar = valorAPagar,

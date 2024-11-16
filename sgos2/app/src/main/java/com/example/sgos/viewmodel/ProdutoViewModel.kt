@@ -25,9 +25,7 @@ class ProdutoViewModel(private val produtoDao: ProdutoDao) : ViewModel() {
     }
 
     fun salvarProduto(
-        nome: String, descricao: String, largura: Float, altura: Float,
-        valorM2: Float, quantidade: Int, valorUnitario: Float, valorSubTotal: Float,
-        acabamentoId: Int, equipamentoId: Int
+        nome: String, descricao: String, acabamentoId: Int, equipamentoId: Int
     ): String {
 
         // Valida se algum campo está vazio
@@ -40,12 +38,6 @@ class ProdutoViewModel(private val produtoDao: ProdutoDao) : ViewModel() {
             id = 0,
             nome = nome,
             descricao = descricao,
-            largura = largura,
-            altura = altura,
-            valorM2 = valorM2,
-            quantidade = quantidade,
-            valorUnitario = valorUnitario,
-            valorSubTotal = valorSubTotal,
             criadoEm = Date(),
             acabamentoId = acabamentoId,
             equipamentoId = equipamentoId
@@ -63,15 +55,11 @@ class ProdutoViewModel(private val produtoDao: ProdutoDao) : ViewModel() {
     fun excluirProduto(produto: Produto) {
         viewModelScope.launch {
             produtoDao.deletar(produto)
-            carregarProdutos() // Atualiza a lista de produtos
+            carregarProdutos()
         }
     }
 
-    fun atualizarProduto(
-        id: Int, nome: String, descricao: String, largura: Float, altura: Float,
-        valorM2: Float, quantidade: Int, valorUnitario: Float, valorSubTotal: Float,
-        acabamentoId: Int, equipamentoId: Int
-    ): String {
+    fun atualizarProduto(id: Int, nome: String, descricao: String, acabamentoId: Int, equipamentoId: Int): String {
 
         if (Validacao.haCamposEmBranco(nome, descricao)) {
             return "Ao editar, preencha todos os campos obrigatórios!"
@@ -82,12 +70,6 @@ class ProdutoViewModel(private val produtoDao: ProdutoDao) : ViewModel() {
         val produtoAtualizado = produto.copy(
             nome = nome,
             descricao = descricao,
-            largura = largura,
-            altura = altura,
-            valorM2 = valorM2,
-            quantidade = quantidade,
-            valorUnitario = valorUnitario,
-            valorSubTotal = valorSubTotal,
             acabamentoId = acabamentoId,
             equipamentoId = equipamentoId
         )
