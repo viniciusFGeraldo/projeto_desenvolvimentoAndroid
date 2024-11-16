@@ -1,10 +1,14 @@
-package com.example.sgos.model
+package com.example.sgos.model.entity
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import java.util.Date
 
+@Entity(tableName = "cliente")
 data class Cliente(
-    val clienteId: Int,
-    val dataCadastro: Date,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int,
+    val dataCadastro: Date = Date(),
     val nome: String,
     val cpf: String,
     val rg: String,
