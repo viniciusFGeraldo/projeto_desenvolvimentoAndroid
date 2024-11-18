@@ -2,14 +2,12 @@ package com.example.sgos.view
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-import android.app.AlertDialog
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,15 +20,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,7 +33,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgos.model.database.AppDatabase
@@ -50,7 +43,6 @@ import com.example.sgos.model.entity.Funcionario
 import com.example.sgos.model.entity.OrdemServico
 import com.example.sgos.model.entity.Produto
 import com.example.sgos.model.entity.Status
-import com.example.sgos.view.theme.SgosTheme
 import com.example.sgos.viewmodel.AcabamentoViewModel
 import com.example.sgos.viewmodel.AcabamentoViewModelFactory
 import com.example.sgos.viewmodel.ClienteViewModel
@@ -60,6 +52,7 @@ import com.example.sgos.viewmodel.EquipamentoViewModelFactory
 import com.example.sgos.viewmodel.FuncionarioViewModel
 import com.example.sgos.viewmodel.FuncionarioViewModelFactory
 import com.example.sgos.viewmodel.OrdemServicoViewModel
+import com.example.sgos.viewmodel.OrdemServicoViewModelFactory
 import com.example.sgos.viewmodel.ProdutoViewModel
 import com.example.sgos.viewmodel.ProdutoViewModelFactory
 
@@ -89,11 +82,16 @@ class MainActivity : ComponentActivity() {
         ProdutoViewModelFactory(dao)
     }
 
+    private val ordemServicoViewModel : OrdemServicoViewModel by viewModels {
+        val dao = AppDatabase.getDatabase(applicationContext).getOrdemServicoDao()
+        OrdemServicoViewModelFactory(dao)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ListaProdutos(produtoViewModel, acabamentoViewModel, equipamentoViewModel)
+            ListaOrdemServico(ordemServicoViewModel, clienteViewModel, produtoViewModel, funcionarioViewModel)
         }
     }
 
@@ -764,7 +762,6 @@ fun ExcluirFuncionario(onConfirm: () -> Unit, onDismiss: () -> Unit) {
 
 
 //TELAS DE PRODUTO
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListaProdutos(produtoViewModel: ProdutoViewModel, acabamentoViewModel: AcabamentoViewModel, equipamentoViewModel: EquipamentoViewModel) {
 
@@ -801,7 +798,6 @@ fun ListaProdutos(produtoViewModel: ProdutoViewModel, acabamentoViewModel: Acaba
     // Verificando se as listas são nulas ou vazias
     if (listaAcabamentos.isEmpty() || listaEquipamentos.isEmpty()) {
         Toast.makeText(context, "Dados não carregados corretamente.", Toast.LENGTH_LONG).show()
-        return
     }
 
     Column(Modifier.fillMaxSize().padding(20.dp)) {
@@ -826,13 +822,14 @@ fun ListaProdutos(produtoViewModel: ProdutoViewModel, acabamentoViewModel: Acaba
             ) {
                 listaAcabamentos.forEach { acabamento ->
                     DropdownMenuItem(
+                        text = {
+                            Text(text = acabamento.nome)
+                        },
                         onClick = {
                             acabamentoSelecionado = acabamento
                             expanded = false
                         }
-                    ) {
-                        Text(text = acabamento.nome)
-                    }
+                    )
                 }
             }
         }
@@ -840,30 +837,28 @@ fun ListaProdutos(produtoViewModel: ProdutoViewModel, acabamentoViewModel: Acaba
         Spacer(modifier = Modifier.height(15.dp))
 
         // ComboBox para selecionar o equipamento
-        Text("Selecione o Equipamento")
-        Box(modifier = Modifier.fillMaxWidth().clickable {
-            var dropdownEquipamentoExpanded = true
-        }) {
-            Text(
-                text = equipamentoSelecionado?.nome ?: "Selecione o equipamento",
-                modifier = Modifier.padding(16.dp)
-            )
-        }
-        DropdownMenu(
-            expanded = dropdownEquipamentoExpanded,
-            onDismissRequest = { dropdownEquipamentoExpanded = false }
-        ) {
-            listaEquipamentos.forEach { equipamento ->
-                DropdownMenuItem(
-                    onClick = {
-                        equipamentoSelecionado = equipamento
-                        dropdownEquipamentoExpanded = false
-                    },
-                ) {
-                    Text(text = equipamento.nome)
+        var expanded2 by remember { mutableStateOf(false) }
+        Box(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+            Button(onClick = { expanded2 = true }) {
+                Text(equipamentoSelecionado?.nome ?: "Selecione um equipamento")
+            }
+            DropdownMenu(
+                expanded = expanded2,
+                onDismissRequest = { expanded2 = false }
+            ) {
+                listaEquipamentos.forEach { equipamento ->
+                    DropdownMenuItem(
+                        text = { Text(text = equipamento.nome) },
+                        onClick = {
+                            equipamentoSelecionado = equipamento
+                            expanded2 = false
+                        }
+                    )
                 }
             }
         }
+
+
 
         Spacer(modifier = Modifier.height(15.dp))
 
@@ -950,8 +945,6 @@ fun ListaProdutos(produtoViewModel: ProdutoViewModel, acabamentoViewModel: Acaba
     }
 }
 
-
-
 @Composable
 fun ExcluirProduto(onConfirm: () -> Unit, onDismiss: () -> Unit) {
     AlertDialog(
@@ -971,6 +964,366 @@ fun ExcluirProduto(onConfirm: () -> Unit, onDismiss: () -> Unit) {
     )
 }
 
+
+//TELAS DE ORDEM DE SERVIÇO
+@Composable
+fun ListaOrdemServico(
+    ordemServicoViewModel: OrdemServicoViewModel,
+    clienteViewModel: ClienteViewModel,
+    produtoViewModel: ProdutoViewModel,
+    funcionarioViewModel: FuncionarioViewModel
+) {
+
+    // Estados dos campos de entrada
+    var largura by remember { mutableStateOf("") }
+    var altura by remember { mutableStateOf("") }
+    var valorM2 by remember { mutableStateOf("") }
+    var quantidade by remember { mutableStateOf("") }
+    var valorUnitario by remember { mutableStateOf("") }
+    var valorTotal by remember { mutableStateOf("") } // Novo estado para o valor total
+    var observacoes by remember { mutableStateOf("") }
+    var textoBotao by remember { mutableStateOf("Salvar") }
+    var modoEditar by remember { mutableStateOf(false) }
+    var ordemServicoTemp by remember { mutableStateOf<OrdemServico?>(null) }
+    var ordemServicoExcluir by remember { mutableStateOf<OrdemServico?>(null) }
+
+    // Listas de dados vindos dos ViewModels
+    val listaOrdemServico by ordemServicoViewModel.listaOrdemServico
+    val listaClientes by clienteViewModel.listaClientes
+    val listaProdutos by produtoViewModel.listaProdutos
+    val listaFuncionarios by funcionarioViewModel.listaFuncionarios
+
+    val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
+
+    // Estados de seleção para cliente, produto e funcionário
+    var clienteSelecionado by remember { mutableStateOf<Cliente?>(null) }
+    var produtoSelecionado by remember { mutableStateOf<Produto?>(null) }
+    var funcionarioSelecionado by remember { mutableStateOf<Funcionario?>(null) }
+
+
+    // Calcular automaticamente o valor unitário e o valor total
+    LaunchedEffect(largura, altura, valorM2, quantidade) {
+        val larguraFloat = largura.toFloatOrNull() ?: 0f
+        val alturaFloat = altura.toFloatOrNull() ?: 0f
+        val valorM2Float = valorM2.toFloatOrNull() ?: 0f
+        val quantidadeInt = quantidade.toIntOrNull() ?: 0
+
+        // Calculando o valor unitário
+        val calculatedValorUnitario = (larguraFloat * alturaFloat) * valorM2Float
+        valorUnitario = calculatedValorUnitario.toString()
+
+        // Calculando o valor total
+        val calculatedValorTotal = calculatedValorUnitario * quantidadeInt
+        valorTotal = calculatedValorTotal.toString()
+    }
+
+    // Variável de estado para exibir ou ocultar a caixa de diálogo
+    var mostrarCaixaDialogo by remember { mutableStateOf(false) }
+
+    // Caixa de diálogo para confirmação de exclusão
+    if (mostrarCaixaDialogo) {
+        ExcluirOrdemServico(onConfirm = {
+            ordemServicoExcluir?.let { ordemServicoViewModel.excluirOrdemServico(it) }
+            mostrarCaixaDialogo = false
+        }, onDismiss = { mostrarCaixaDialogo = false })
+    }
+
+    Column(Modifier.fillMaxSize().padding(16.dp)) {
+        Text(text = "Lista de Ordens de Serviço", modifier = Modifier.fillMaxWidth(), fontSize = 22.sp)
+        Spacer(modifier = Modifier.height(15.dp))
+
+        // ComboBox para selecionar o cliente
+        var expandedCliente by remember { mutableStateOf(false) }
+        Box(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+            Button(onClick = { expandedCliente = true }) {
+                Text(clienteSelecionado?.nome ?: "Selecione um Cliente")
+            }
+            DropdownMenu(
+                expanded = expandedCliente,
+                onDismissRequest = { expandedCliente = false }
+            ) {
+                listaClientes.forEach { cliente ->
+                    DropdownMenuItem(
+                        text = { Text(text = cliente.nome) },
+                        onClick = {
+                            clienteSelecionado = cliente
+                            expandedCliente = false
+                        }
+                    )
+                }
+            }
+        }
+
+        // ComboBox para selecionar o funcionário
+        var expandedFuncionario by remember { mutableStateOf(false) }
+        Box(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+            Button(onClick = { expandedFuncionario = true }) {
+                Text(funcionarioSelecionado?.nome ?: "Selecione um Funcionário")
+            }
+            DropdownMenu(
+                expanded = expandedFuncionario,
+                onDismissRequest = { expandedFuncionario = false }
+            ) {
+                listaFuncionarios.forEach { funcionario ->
+                    DropdownMenuItem(
+                        text = { Text(text = funcionario.nome) },
+                        onClick = {
+                            funcionarioSelecionado = funcionario
+                            expandedFuncionario = false
+                        }
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        TextField(
+            value = observacoes,
+            onValueChange = { observacoes = it },
+            label = { Text("Observações") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(15.dp))
+        // ComboBox para selecionar o produto
+        var expandedProduto by remember { mutableStateOf(false) }
+        Box(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+            Button(onClick = { expandedProduto = true }) {
+                Text(produtoSelecionado?.nome ?: "Selecione um Produto")
+            }
+            DropdownMenu(
+                expanded = expandedProduto,
+                onDismissRequest = { expandedProduto = false }
+            ) {
+                listaProdutos.forEach { produto ->
+                    DropdownMenuItem(
+                        text = { Text(text = produto.nome) },
+                        onClick = {
+                            produtoSelecionado = produto
+                            expandedProduto = false
+                        }
+                    )
+                }
+            }
+        }
+        TextField(
+            value = largura,
+            onValueChange = { largura = it },
+            label = { Text("Largura") },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        TextField(
+            value = altura,
+            onValueChange = { altura = it },
+            label = { Text("Altura") },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        TextField(
+            value = valorM2,
+            onValueChange = { valorM2 = it },
+            label = { Text("Valor por M2") },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        TextField(
+            value = quantidade,
+            onValueChange = { quantidade = it },
+            label = { Text("Quantidade") },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Agora, valorUnitario é calculado automaticamente e só é exibido, sem possibilidade de edição
+        TextField(
+            value = valorUnitario,
+            onValueChange = { }, // Não permite edição manual
+            label = { Text("Valor Unitário") },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+            modifier = Modifier.fillMaxWidth(),
+            enabled = false // Desabilitado
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Novo campo para o valor total
+        TextField(
+            value = valorTotal,
+            onValueChange = { }, // Não permite edição manual
+            label = { Text("Valor Total") },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+            modifier = Modifier.fillMaxWidth(),
+            enabled = false // Desabilitado
+        )
+
+        Spacer(modifier = Modifier.height(15.dp))
+
+        // Botão de Salvar ou Atualizar
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+                if (clienteSelecionado == null || produtoSelecionado == null || funcionarioSelecionado == null) {
+                    Toast.makeText(context, "Selecione um Cliente, Produto e Funcionário.", Toast.LENGTH_LONG).show()
+                } else {
+                    val retorno: String = if (modoEditar) {
+                        ordemServicoTemp?.let {
+                            // Agora passando valorTotal no lugar de valorUnitario * quantidade
+                            ordemServicoViewModel.atualizarOrdemServico(
+                                it.id,
+                                largura.toFloat(),
+                                altura.toFloat(),
+                                valorM2.toFloat(),
+                                quantidade.toInt(),
+                                valorUnitario.toFloat(),
+                                valorTotal.toFloat(), // Usando valorTotal calculado
+                                0f, // Definindo valorDesconto como 0 por padrão, pode ser alterado
+                                0f, // valorAPagar é igual ao valorTotal por enquanto
+                                observacoes,
+                                Status.EM_PRODUCAO, // Status fixo, pode ser alterado conforme a lógica
+                                clienteSelecionado!!.id, // Passando o clienteId
+                                funcionarioSelecionado!!.id, // Passando o funcionarioId
+                                produtoSelecionado!!.id // Passando o produtoId
+                            ).also {
+                                modoEditar = false
+                                textoBotao = "Salvar"
+                            }
+                        } ?: "Erro ao editar ordem de serviço"
+                    } else {
+                        ordemServicoViewModel.salvarOrdemServico(
+                            largura.toFloat(),
+                            altura.toFloat(),
+                            valorM2.toFloat(),
+                            quantidade.toInt(),
+                            valorUnitario.toFloat(),
+                            valorTotal.toFloat(), // Usando valorTotal calculado
+                            0f,
+                            0f,
+                            observacoes,
+                            Status.EM_PRODUCAO,
+                            clienteSelecionado!!.id,
+                            funcionarioSelecionado!!.id,
+                            produtoSelecionado!!.id
+                        )
+                    }
+
+                    Toast.makeText(context, retorno, Toast.LENGTH_LONG).show()
+
+                    // Limpar os campos
+                    largura = ""
+                    altura = ""
+                    valorM2 = ""
+                    quantidade = ""
+                    valorUnitario = ""
+                    valorTotal = ""
+                    observacoes = ""
+                    clienteSelecionado = null
+                    produtoSelecionado = null
+                    funcionarioSelecionado = null
+                    focusManager.clearFocus()
+                }
+            }
+        ) {
+            Text(text = textoBotao)
+        }
+
+        Spacer(modifier = Modifier.height(15.dp))
+
+
+        LazyColumn {
+            items(listaOrdemServico) { ordemServico ->
+
+                val cliente = listaClientes.find { it.id == ordemServico.clienteId }
+                val funcionario = listaFuncionarios.find { it.id == ordemServico.funcionarioId }
+                val produto = listaProdutos.find { it.id == ordemServico.produtoId }
+
+                Text(
+                    text = "Ordem de Serviço: ${ordemServico.id}",
+                    modifier = Modifier.fillMaxWidth(),
+                    fontSize = 18.sp
+                )
+                Spacer(modifier = Modifier.height(5.dp))
+
+                // Exibe o nome do cliente
+                cliente?.let {
+                    Text(
+                        text = "Cliente: ${it.nome}",
+                        modifier = Modifier.fillMaxWidth(),
+                        fontSize = 16.sp
+                    )
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+
+                funcionario?.let {
+                    Text(
+                        text = "Funcionário: ${it.nome}",
+                        modifier = Modifier.fillMaxWidth(),
+                        fontSize = 16.sp
+                    )
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+
+                produto?.let {
+                    Text(
+                        text = "Produto: ${it.nome}",
+                        modifier = Modifier.fillMaxWidth(),
+                        fontSize = 16.sp
+                    )
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(text = "Status: ${ordemServico.status}")
+
+                Row {
+                    Button(onClick = {
+                        ordemServicoExcluir = ordemServico
+                        mostrarCaixaDialogo = true
+                    }) {
+                        Text(text = "Excluir")
+                    }
+
+                    Button(onClick = {
+                        modoEditar = true
+                        ordemServicoTemp = ordemServico
+                        largura = ordemServico.largura.toString()
+                        altura = ordemServico.altura.toString()
+                        valorM2 = ordemServico.valorM2.toString()
+                        quantidade = ordemServico.quantidade.toString()
+                        valorUnitario = ordemServico.valorUnitario.toString()
+                        valorTotal = ordemServico.valorTotal.toString()
+                        observacoes = ordemServico.observacoes
+                        textoBotao = "Atualizar"
+                    }) {
+                        Text(text = "Editar")
+                    }
+
+                    Button(onClick = {
+                        val nextStatus = when (ordemServico.status) {
+                            Status.EM_PRODUCAO -> Status.EM_ACABAMENTO
+                            Status.EM_ACABAMENTO -> Status.PRONTO_PARA_ENTREGA
+                            Status.PRONTO_PARA_ENTREGA -> Status.SOLICITADO_BAIXA
+                            Status.SOLICITADO_BAIXA -> Status.BAIXADA
+                            Status.BAIXADA -> Status.BAIXADA // Ou qualquer outro comportamento
+                        }
+                        ordemServicoViewModel.atualizarStatus(ordemServico)
+                    }) {
+                        Text("Atualizar Status")
+                    }
+                }
+                Spacer(modifier = Modifier.height(15.dp))
+            }
+        }
+
+    }
+}
 
 
 
