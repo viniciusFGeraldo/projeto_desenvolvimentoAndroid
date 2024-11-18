@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,12 +30,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.sgos.model.database.AppDatabase
 import com.example.sgos.model.entity.Acabamento
 import com.example.sgos.model.entity.Cliente
@@ -91,12 +98,89 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ListaOrdemServico(ordemServicoViewModel, clienteViewModel, produtoViewModel, funcionarioViewModel)
+            AppNavigation()        }
+    }
+}
+
+@Composable
+fun AppNavigation() {
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = "telaInicial") {
+        composable("telaInicial") { TelaInicial(navController) }
+        composable("menuCadastros") { MenuCadastros(navController) }
+        composable("listaAcabamento") { ListaAcabamento(navController) }
+        composable("listaClientes") { ListaClientes(navController) }
+        composable("listaEquipamentos") { ListaEquipamentos(navController) }
+        composable("listaFuncionarios") { ListaFuncionarios(navController) }
+        composable("listaProdutos") { ListaProdutos(navController) }
+        composable("listaOrdemServico") { ListaOrdemServico(navController) }
+    }
+}
+
+@Composable
+fun TelaInicial(navController: NavController) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Button(
+            onClick = { navController.navigate("menuCadastros") },
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text(text = "Menu de Cadastros")
+        }
+        Button(
+            onClick = { navController.navigate("listaOrdemServico") },
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text(text = "Ordens de Serviço")
         }
     }
-
-
 }
+
+@Composable
+fun MenuCadastros(navController: NavController) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Lista de botões para cada cadastro
+        Button(
+            onClick = { navController.navigate("listaAcabamento") },
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text(text = "Cadastro de Acabamento")
+        }
+        Button(
+            onClick = { navController.navigate("listaClientes") },
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text(text = "Cadastro de Clientes")
+        }
+        Button(
+            onClick = { navController.navigate("listaEquipamentos") },
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text(text = "Cadastro de Equipamentos")
+        }
+        Button(
+            onClick = { navController.navigate("listaFuncionarios") },
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text(text = "Cadastro de Funcionários")
+        }
+        Button(
+            onClick = { navController.navigate("listaProdutos") },
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text(text = "Cadastro de Produtos")
+        }
+    }
+}
+
 
 //TELAS DE ACABAMENTO
 @Composable
@@ -134,7 +218,7 @@ fun CadastrarAcabamento(acabamentoViewModel: AcabamentoViewModel){
 }
 
 @Composable
-fun ListaAcabamento(acabamentoViewModel: AcabamentoViewModel){
+fun ListaAcabamento(acabamentoViewModel: AcabamentoViewModel,navController: NavController){
     var nome by remember { mutableStateOf("") }
     var descricao by remember { mutableStateOf("") }
     var acabamentoTemp by remember { mutableStateOf<Acabamento?>(null) }
@@ -181,6 +265,8 @@ fun ListaAcabamento(acabamentoViewModel: AcabamentoViewModel){
 
                     acabamentoViewModel.salvarAcabamento(nome, descricao)
                 }
+
+                navController.navigate("telaInicial")
 
                 Toast.makeText(context, retorno, Toast.LENGTH_LONG).show()
 
@@ -965,14 +1051,11 @@ fun ExcluirProduto(onConfirm: () -> Unit, onDismiss: () -> Unit) {
 }
 
 
+
+
 //TELAS DE ORDEM DE SERVIÇO
 @Composable
-fun ListaOrdemServico(
-    ordemServicoViewModel: OrdemServicoViewModel,
-    clienteViewModel: ClienteViewModel,
-    produtoViewModel: ProdutoViewModel,
-    funcionarioViewModel: FuncionarioViewModel
-) {
+fun ListaOrdemServico(ordemServicoViewModel: OrdemServicoViewModel, clienteViewModel: ClienteViewModel, produtoViewModel: ProdutoViewModel, funcionarioViewModel: FuncionarioViewModel) {
 
     // Estados dos campos de entrada
     var largura by remember { mutableStateOf("") }
@@ -1000,6 +1083,8 @@ fun ListaOrdemServico(
     var clienteSelecionado by remember { mutableStateOf<Cliente?>(null) }
     var produtoSelecionado by remember { mutableStateOf<Produto?>(null) }
     var funcionarioSelecionado by remember { mutableStateOf<Funcionario?>(null) }
+    var mostrarSolicitacaoBaixa by remember { mutableStateOf<OrdemServico?>(null) }
+
 
 
     // Calcular automaticamente o valor unitário e o valor total
@@ -1305,27 +1390,48 @@ fun ListaOrdemServico(
                         Text(text = "Editar")
                     }
 
-                    Button(onClick = {
-                        val nextStatus = when (ordemServico.status) {
-                            Status.EM_PRODUCAO -> Status.EM_ACABAMENTO
-                            Status.EM_ACABAMENTO -> Status.PRONTO_PARA_ENTREGA
-                            Status.PRONTO_PARA_ENTREGA -> Status.SOLICITADO_BAIXA
-                            Status.SOLICITADO_BAIXA -> Status.BAIXADA
-                            Status.BAIXADA -> Status.BAIXADA // Ou qualquer outro comportamento
+                    // Verificar se o status é 'SOLICITADO_BAIXA' e abrir o Composable de Solicitação de Baixa
+                    if (ordemServico.status == Status.SOLICITADO_BAIXA) {
+                        Button(onClick = {
+                            mostrarSolicitacaoBaixa = ordemServico
+                        }) {
+                            Text("Solicitar Baixa")
                         }
-                        ordemServicoViewModel.atualizarStatus(ordemServico)
-                    }) {
-                        Text("Atualizar Status")
+                    } else {
+                        Button(onClick = {
+                            val nextStatus = when (ordemServico.status) {
+                                Status.EM_PRODUCAO -> Status.EM_ACABAMENTO
+                                Status.EM_ACABAMENTO -> Status.PRONTO_PARA_ENTREGA
+                                Status.PRONTO_PARA_ENTREGA -> Status.SOLICITADO_BAIXA
+                                Status.SOLICITADO_BAIXA -> Status.SOLICITADO_BAIXA // Não alteramos para BAIXADA aqui
+                                Status.BAIXADA -> Status.BAIXADA // Ou qualquer outro comportamento
+                            }
+                            ordemServicoViewModel.atualizarStatus(ordemServico.copy(status = nextStatus))
+                        }) {
+                            Text("Atualizar Status")
+                        }
                     }
                 }
                 Spacer(modifier = Modifier.height(15.dp))
             }
         }
 
+        if (mostrarSolicitacaoBaixa != null) {
+            SolicitarBaixa(
+                ordemServico = mostrarSolicitacaoBaixa!!,
+                onSolicitar = { ordemServico ->
+                    // Realizar a solicitação de baixa (pode envolver um request para o servidor ou uma alteração de status)
+                    ordemServicoViewModel.atualizarStatus(ordemServico.copy(status = Status.BAIXADA))
+                    mostrarSolicitacaoBaixa = null // Fechar a tela de solicitação
+                },
+                onDismiss = {
+                    mostrarSolicitacaoBaixa = null // Fechar a tela de solicitação sem fazer nada
+                }
+            )
+        }
+
     }
 }
-
-
 
 @Composable
 fun ExcluirOrdemServico(onConfirm: () -> Unit, onDismiss: () -> Unit) {
@@ -1344,6 +1450,44 @@ fun ExcluirOrdemServico(onConfirm: () -> Unit, onDismiss: () -> Unit) {
             }
         }
     )
+}
+
+
+
+
+@Composable
+fun SolicitarBaixa(ordemServico: OrdemServico, onSolicitar: (OrdemServico) -> Unit, onDismiss: () -> Unit) {
+
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        Text(text = "Solicitação de Baixa", fontSize = 22.sp)
+
+        Spacer(modifier = Modifier.height(15.dp))
+
+        Text(text = "Ordem de Serviço: ${ordemServico.id}", fontSize = 18.sp)
+        Text(text = "Cliente: ${ordemServico.clienteId}", fontSize = 16.sp) // Você pode buscar o cliente pelo ID
+        Text(text = "Produto: ${ordemServico.produtoId}", fontSize = 16.sp) // Você pode buscar o produto pelo ID
+        Text(text = "Status Atual: ${ordemServico.status}", fontSize = 16.sp)
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Button(
+            onClick = {
+                onSolicitar(ordemServico)  // Aqui você pode enviar a solicitação
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Confirmar Solicitação de Baixa")
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Button(
+            onClick = { onDismiss() },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Cancelar")
+        }
+    }
 }
 
 
