@@ -61,7 +61,17 @@ enum class Status(val statusCode: Int) {
     EM_ACABAMENTO(1),
     PRONTO_PARA_ENTREGA(2),
     SOLICITADO_BAIXA(3),
-    BAIXADA(4)
+    BAIXADA(4);
+
+    fun nextStatus(): Status {
+        return when (this) {
+            EM_PRODUCAO -> EM_ACABAMENTO
+            EM_ACABAMENTO -> PRONTO_PARA_ENTREGA
+            PRONTO_PARA_ENTREGA -> SOLICITADO_BAIXA
+            SOLICITADO_BAIXA -> BAIXADA
+            BAIXADA -> this // Ou lançar uma exceção
+        }
+    }
 }
 
 // TypeConverter para Status (caso o Room não lide com enum diretamente)
