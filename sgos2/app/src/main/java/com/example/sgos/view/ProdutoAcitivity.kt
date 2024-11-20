@@ -1,6 +1,8 @@
 package com.example.sgos.view
 
 import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,18 +15,26 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -37,9 +47,14 @@ import com.example.sgos.viewmodel.ProdutoViewModel
 
 
 //TELAS DE PRODUTO
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListaProdutos(produtoViewModel: ProdutoViewModel, acabamentoViewModel: AcabamentoViewModel, equipamentoViewModel: EquipamentoViewModel, navController: NavController) {
-
+fun ListaProdutos(
+    produtoViewModel: ProdutoViewModel,
+    acabamentoViewModel: AcabamentoViewModel,
+    equipamentoViewModel: EquipamentoViewModel,
+    navController: NavController
+) {
     var nome by remember { mutableStateOf("") }
     var descricao by remember { mutableStateOf("") }
 
@@ -76,30 +91,76 @@ fun ListaProdutos(produtoViewModel: ProdutoViewModel, acabamentoViewModel: Acaba
     }
 
     Column(Modifier.fillMaxSize().padding(20.dp)) {
-        Text(text = "Lista de Produtos", modifier = Modifier.fillMaxWidth(), fontSize = 22.sp)
+
+        // Título
+        Text(
+            text = "Cadastro/Atualizar Produto",
+            modifier = Modifier.fillMaxWidth(),
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF1A1A1A)
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // Campo de texto para nome
+        TextField(
+            value = nome,
+            onValueChange = { nome = it },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text(text = "Nome do Produto") },
+            colors = TextFieldDefaults.textFieldColors(
+                focusedIndicatorColor = Color(0xFF4CAF50),
+                unfocusedIndicatorColor = Color(0xFFBDBDBD),
+                focusedLabelColor = Color(0xFF4CAF50),
+                unfocusedLabelColor = Color(0xFF757575),
+            ),
+            shape = MaterialTheme.shapes.medium,
+            singleLine = true
+        )
+
         Spacer(modifier = Modifier.height(15.dp))
 
-        TextField(value = nome, onValueChange = { nome = it }, modifier = Modifier.fillMaxWidth(), label = { Text(text = "Nome do Produto") })
-        Spacer(modifier = Modifier.height(15.dp))
+        // Campo de texto para descrição
+        TextField(
+            value = descricao,
+            onValueChange = { descricao = it },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text(text = "Descrição do Produto") },
+            colors = TextFieldDefaults.textFieldColors(
+                focusedIndicatorColor = Color(0xFF4CAF50),
+                unfocusedIndicatorColor = Color(0xFFBDBDBD),
+                focusedLabelColor = Color(0xFF4CAF50),
+                unfocusedLabelColor = Color(0xFF757575),
+            ),
+            shape = MaterialTheme.shapes.medium,
+            singleLine = true
+        )
 
-        TextField(value = descricao, onValueChange = { descricao = it }, modifier = Modifier.fillMaxWidth(), label = { Text(text = "Descrição do Produto") })
         Spacer(modifier = Modifier.height(15.dp))
 
         // ComboBox para selecionar o acabamento
         var expanded by remember { mutableStateOf(false) }
-        Box(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-            Button(onClick = { expanded = true }) {
-                Text(acabamentoSelecionado?.nome ?: "Selecione um Acabamento")
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        ) {
+            Button(
+                onClick = { expanded = true },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF000000))
+            ) {
+                Text(acabamentoSelecionado?.nome ?: "Selecione um Acabamento", color = Color.White)
             }
+
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {
                 listaAcabamentos.forEach { acabamento ->
                     DropdownMenuItem(
-                        text = {
-                            Text(text = acabamento.nome)
-                        },
+                        text = { Text(text = acabamento.nome) },
                         onClick = {
                             acabamentoSelecionado = acabamento
                             expanded = false
@@ -109,13 +170,17 @@ fun ListaProdutos(produtoViewModel: ProdutoViewModel, acabamentoViewModel: Acaba
             }
         }
 
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // ComboBox para selecionar o equipamento
         var expanded2 by remember { mutableStateOf(false) }
         Box(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-            Button(onClick = { expanded2 = true }) {
-                Text(equipamentoSelecionado?.nome ?: "Selecione um equipamento")
+            Button(
+                onClick = { expanded2 = true },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF000000))
+            ) {
+                Text(equipamentoSelecionado?.nome ?: "Selecione um Equipamento", color = Color.White)
             }
             DropdownMenu(
                 expanded = expanded2,
@@ -133,13 +198,14 @@ fun ListaProdutos(produtoViewModel: ProdutoViewModel, acabamentoViewModel: Acaba
             }
         }
 
-
-
         Spacer(modifier = Modifier.height(15.dp))
 
         // Botão de Salvar ou Atualizar
         Button(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
+                .height(50.dp)
+                .padding(horizontal = 60.dp)
+                .padding(vertical = 5.dp),
             onClick = {
                 if (acabamentoSelecionado == null || equipamentoSelecionado == null) {
                     Toast.makeText(context, "Selecione acabamento e equipamento.", Toast.LENGTH_LONG).show()
@@ -176,42 +242,72 @@ fun ListaProdutos(produtoViewModel: ProdutoViewModel, acabamentoViewModel: Acaba
                     equipamentoSelecionado = null
                     focusManager.clearFocus()
                 }
-            }
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
+            shape = MaterialTheme.shapes.medium
         ) {
-            Text(text = textoBotao)
+            Text(text = textoBotao, color = Color.White, fontWeight = FontWeight.Bold)
         }
 
         Spacer(modifier = Modifier.height(15.dp))
 
+        Text(text = "Lista de Produtos",
+            modifier = Modifier.fillMaxWidth(),
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF1A1A1A))
+
         // Lista de produtos
         LazyColumn {
             items(listaProdutos) { produto ->
-                Text(
-                    text = "${produto.nome} - ${produto.descricao}",
-                    modifier = Modifier.fillMaxWidth(),
-                    fontSize = 18.sp
-                )
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                        .shadow(4.dp, shape = MaterialTheme.shapes.medium),
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = "${produto.nome} - ${produto.descricao}",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
 
-                Spacer(modifier = Modifier.height(5.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
-                Row {
-                    Button(onClick = {
-                        produtoExcluir = produto
-                        mostrarCaixaDialogo = true
-                    }) {
-                        Text(text = "Excluir")
-                    }
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            // Botão Excluir
+                            Button(
+                                onClick = {
+                                    produtoExcluir = produto
+                                    mostrarCaixaDialogo = true
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                                shape = MaterialTheme.shapes.small
+                            ) {
+                                Text(text = "Excluir", color = Color.White)
+                            }
 
-                    Button(onClick = {
-                        modoEditar = true
-                        produtoTemp = produto
-                        nome = produto.nome
-                        descricao = produto.descricao
-                        acabamentoSelecionado = listaAcabamentos.find { it.id == produto.acabamentoId }
-                        equipamentoSelecionado = listaEquipamentos.find { it.id == produto.equipamentoId }
-                        textoBotao = "Atualizar"
-                    }) {
-                        Text(text = "Atualizar")
+                            // Botão Atualizar
+                            Button(
+                                onClick = {
+                                    modoEditar = true
+                                    produtoTemp = produto
+                                    nome = produto.nome
+                                    descricao = produto.descricao
+                                    acabamentoSelecionado = listaAcabamentos.find { it.id == produto.acabamentoId }
+                                    equipamentoSelecionado = listaEquipamentos.find { it.id == produto.equipamentoId }
+                                    textoBotao = "Atualizar"
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
+                                shape = MaterialTheme.shapes.small
+                            ) {
+                                Text(text = "Atualizar", color = Color.White)
+                            }
+                        }
                     }
                 }
                 Spacer(modifier = Modifier.height(15.dp))
@@ -219,6 +315,7 @@ fun ListaProdutos(produtoViewModel: ProdutoViewModel, acabamentoViewModel: Acaba
         }
     }
 }
+
 
 @Composable
 fun ExcluirProduto(onConfirm: () -> Unit, onDismiss: () -> Unit) {
