@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -91,6 +92,7 @@ fun AppNavigation(
     ordemServicoViewModel: OrdemServicoViewModel
 ) {
     val navController = rememberNavController()
+    val context = LocalContext.current;
 
     NavHost(navController = navController, startDestination = "telaInicial") {
         composable("telaInicial") { TelaInicial(navController) }
@@ -111,7 +113,15 @@ fun AppNavigation(
         composable("solicitacaoDeBaixa/{osJson}") {backStackEntry ->
             val osJson = backStackEntry.arguments?.getString("osJson")
             val os = Gson().fromJson(osJson, OrdemServico::class.java)
-            SolicitarBaixa(os, navController, ordemServicoViewModel)
+            MostrarInformacaoOS(os, navController, ordemServicoViewModel,produtoViewModel,  clienteViewModel, funcionarioViewModel, context)
+        }
+        composable("mostrarInformacaoOS/{osId}") {backStackEntry ->
+            val osId = backStackEntry.arguments?.getString("osId")
+            val os = ordemServicoViewModel.listaOrdemServico.value.find { it.id == osId?.toInt() }
+            if(os != null){
+                MostrarInformacaoOS(os, navController, ordemServicoViewModel, produtoViewModel,  clienteViewModel, funcionarioViewModel, context)
+            }
+
         }
 
     }
