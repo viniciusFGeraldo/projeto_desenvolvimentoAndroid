@@ -147,8 +147,6 @@ fun ListaAcabamento(acabamentoViewModel: AcabamentoViewModel, navController: Nav
                     acabamentoViewModel.salvarAcabamento(nome, descricao)
                 }
 
-                navController.navigate("telaInicial")
-
                 Toast.makeText(context, retorno, Toast.LENGTH_LONG).show()
 
                 nome = ""

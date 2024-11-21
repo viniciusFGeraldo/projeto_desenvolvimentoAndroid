@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -86,7 +87,7 @@ fun ListaOrdemServico(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(25.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -211,7 +212,8 @@ fun formOrdemServico(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(10.dp, 30.dp, 10.dp, 30.dp)
+            .size(100.dp)
             .verticalScroll(rememberScrollState())
     ) {
         Text(
@@ -343,6 +345,8 @@ fun formOrdemServico(
         ) {
             Text(text = if (modoEditar) "Salvar Alterações" else "Cadastrar Ordem de Serviço")
         }
+
+        Spacer(modifier = Modifier.height(30.dp))
     }
 }
 
@@ -356,7 +360,9 @@ fun <T> DropdownMenuField(
 ) where T : Any {
     var expanded by remember { mutableStateOf(false) }
 
-    Column(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(bottom = 8.dp)) {
         Text(text = label, style = MaterialTheme.typography.bodyMedium)
         Box {
             OutlinedButton(
@@ -400,7 +406,9 @@ fun OutlinedTextFieldWithSpacing(
         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = keyboardType),
         singleLine = singleLine,
         maxLines = maxLines,
-        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp)
     )
 }
 
@@ -411,7 +419,9 @@ fun ReadOnlyTextFieldWithSpacing(value: String, label: String) {
         value = value,
         onValueChange = {},
         label = { Text(label) },
-        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp),
         enabled = false
     )
 }
@@ -530,6 +540,21 @@ fun MostrarInformacaoOS(
                 .padding(bottom = 20.dp), // Espaço do rodapé
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
+
+            when(ordemServico.status){
+                Status.SOLICITADO_BAIXA ->{
+
+                }
+
+                Status.BAIXADA -> {
+
+                }
+                else ->{
+
+                }
+            }
+
+
             Button(
                 onClick = {
                     mostrarCaixaDialogo = true
@@ -541,17 +566,40 @@ fun MostrarInformacaoOS(
             ) {
                 Text("Excluir", color = Color.White)
             }
-            Button(
-                onClick = {
-                    val osJson = Gson().toJson(ordemServico);
-                    navController.navigate("editarOrdemSerivo/${Gson().toJson(ordemServico)}")
-                },
-                colors = ButtonDefaults.buttonColors(Color.Blue),
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 8.dp)
-            ) {
-                Text("Editar", color = Color.White)
+
+            if(ordemServico.status != Status.BAIXADA){
+                Button(
+                    onClick = {
+                        val osJson = Gson().toJson(ordemServico);
+                        navController.navigate("editarOrdemSerivo/${Gson().toJson(ordemServico)}")
+                    },
+                    colors = ButtonDefaults.buttonColors(Color.Blue),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 8.dp)
+                ) {
+                    Text("Editar", color = Color.White)
+                }
+
+                if(ordemServico.status != Status.SOLICITADO_BAIXA) {
+                    Button(onClick = {
+                        ordemServicoViewModel.atualizarStatus(ordemServico)
+                    }) {
+                        Text("Atualizar Status")
+                    }
+                }else{
+                    Button(onClick = {
+                        ordemServicoViewModel.atualizarStatus(ordemServico);
+
+                        Toast.makeText(
+                            context,
+                            "Solicitado Baixa de Ordem de Serviço",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }) {
+                        Text("Solicitar Baixa")
+                    }
+                }
             }
         }
     }

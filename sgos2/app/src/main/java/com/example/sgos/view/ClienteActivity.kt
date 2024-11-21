@@ -9,8 +9,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -68,265 +71,270 @@ fun ListaClientes(clienteViewModel: ClienteViewModel, navController: NavControll
         }, onDismiss = { mostrarCaixaDialogo = false })
     }
 
-    Column(Modifier.fillMaxSize().padding(20.dp)) {
-
-        Spacer(modifier = Modifier.height(35.dp))
-        Text(
-            text = "Cadastrar/Atualizar Cliente",
-            modifier = Modifier.fillMaxWidth(),
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF1A1A1A)  // Cor mais suave para o título
-        )
-        Spacer(modifier = Modifier.height(25.dp))
-
-        // Campo para Nome
-        TextField(
-            value = nome,
-            onValueChange = { nome = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),  // Adiciona padding lateral
-            label = { Text(text = "Nome") },
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = Color(0xFF1A1A1A),
-                unfocusedIndicatorColor = Color(0xFFBDBDBD),
-                focusedLabelColor = Color(0xFF1A1A1A),
-                unfocusedLabelColor = Color(0xFF757575),
-            ),
-            shape = MaterialTheme.shapes.medium,
-            singleLine = true,
-            textStyle = TextStyle(
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Normal,
-                color = Color.Black
-            )
-        )
-
-        Spacer(modifier = Modifier.height(15.dp))
-
-        // Campo para CPF
-        TextField(
-            value = cpf,
-            onValueChange = { cpf = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            label = { Text(text = "CPF") },
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = Color(0xFF1A1A1A),
-                unfocusedIndicatorColor = Color(0xFFBDBDBD),
-                focusedLabelColor = Color(0xFF1A1A1A),
-                unfocusedLabelColor = Color(0xFF757575),
-            ),
-            shape = MaterialTheme.shapes.medium,
-            singleLine = true,
-            textStyle = TextStyle(
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Normal,
-                color = Color.Black
-            )
-        )
-
-        Spacer(modifier = Modifier.height(15.dp))
-
-        // Campo para RG
-        TextField(
-            value = rg,
-            onValueChange = { rg = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            label = { Text(text = "RG") },
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = Color(0xFF1A1A1A),
-                unfocusedIndicatorColor = Color(0xFFBDBDBD),
-                focusedLabelColor = Color(0xFF1A1A1A),
-                unfocusedLabelColor = Color(0xFF757575),
-            ),
-            shape = MaterialTheme.shapes.medium,
-            singleLine = true,
-            textStyle = TextStyle(
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Normal,
-                color = Color.Black
-            )
-        )
-
-        Spacer(modifier = Modifier.height(15.dp))
-
-        // Campo para CEP
-        TextField(
-            value = cep,
-            onValueChange = { cep = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            label = { Text(text = "CEP") },
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = Color(0xFF1A1A1A),
-                unfocusedIndicatorColor = Color(0xFFBDBDBD),
-                focusedLabelColor = Color(0xFF1A1A1A),
-                unfocusedLabelColor = Color(0xFF757575),
-            ),
-            shape = MaterialTheme.shapes.medium,
-            singleLine = true,
-            textStyle = TextStyle(
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Normal,
-                color = Color.Black
-            )
-        )
-
-        Spacer(modifier = Modifier.height(15.dp))
-
-        // Campo para Endereço
-        TextField(
-            value = endereco,
-            onValueChange = { endereco = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            label = { Text(text = "Endereço") },
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = Color(0xFF1A1A1A),
-                unfocusedIndicatorColor = Color(0xFFBDBDBD),
-                focusedLabelColor = Color(0xFF1A1A1A),
-                unfocusedLabelColor = Color(0xFF757575),
-            ),
-            shape = MaterialTheme.shapes.medium,
-            singleLine = true,
-            textStyle = TextStyle(
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Normal,
-                color = Color.Black
-            )
-        )
-
-        Spacer(modifier = Modifier.height(15.dp))
-
-        // Campo para Bairro
-        TextField(
-            value = bairro,
-            onValueChange = { bairro = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            label = { Text(text = "Bairro") },
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = Color(0xFF1A1A1A),
-                unfocusedIndicatorColor = Color(0xFFBDBDBD),
-                focusedLabelColor = Color(0xFF1A1A1A),
-                unfocusedLabelColor = Color(0xFF757575),
-            ),
-            shape = MaterialTheme.shapes.medium,
-            singleLine = true,
-            textStyle = TextStyle(
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Normal,
-                color = Color.Black
-            )
-        )
-
-        Spacer(modifier = Modifier.height(15.dp))
-
-        // Campo para Cidade
-        TextField(
-            value = cidade,
-            onValueChange = { cidade = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            label = { Text(text = "Cidade") },
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = Color(0xFF1A1A1A),
-                unfocusedIndicatorColor = Color(0xFFBDBDBD),
-                focusedLabelColor = Color(0xFF1A1A1A),
-                unfocusedLabelColor = Color(0xFF757575),
-            ),
-            shape = MaterialTheme.shapes.medium,
-            singleLine = true,
-            textStyle = TextStyle(
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Normal,
-                color = Color.Black
-            )
-        )
-
-        Spacer(modifier = Modifier.height(15.dp))
-
-        // Campo para Telefone
-        TextField(
-            value = telefone,
-            onValueChange = { telefone = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            label = { Text(text = "Telefone") },
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = Color(0xFF1A1A1A),
-                unfocusedIndicatorColor = Color(0xFFBDBDBD),
-                focusedLabelColor = Color(0xFF1A1A1A),
-                unfocusedLabelColor = Color(0xFF757575),
-            ),
-            shape = MaterialTheme.shapes.medium,
-            singleLine = true,
-            textStyle = TextStyle(
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Normal,
-                color = Color.Black
-            )
-        )
-
-        Spacer(modifier = Modifier.height(15.dp))
-
-        // Botão de salvar/atualizar
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-                .padding(horizontal = 60.dp)
-                .padding(vertical = 5.dp),
-            onClick = {
-                val retorno: String? = if (modoEditar) {
-                    clienteTemp?.let {
-                        clienteViewModel.atualizarCliente(it.id, nome, cpf, rg, cep, endereco, bairro, cidade, telefone).also {
-                            modoEditar = false
-                            textoBotao = "Salvar"
-                        }
-                    }
-                } else {
-                    clienteViewModel.salvarCliente(nome, cpf, rg, cep, endereco, bairro, cidade, telefone)
-                }
-
-                Toast.makeText(context, retorno, Toast.LENGTH_LONG).show()
-
-                nome = ""
-                cpf = ""
-                rg = ""
-                cep = ""
-                endereco = ""
-                bairro = ""
-                cidade = ""
-                telefone = ""
-                focusManager.clearFocus()
-            },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF4CAF50), // Cor de fundo verde
-                contentColor = Color.White // Cor do texto branco
-            ),
-            shape = MaterialTheme.shapes.small  // Bordas arredondadas pequenas
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(10.dp, 30.dp, 10.dp, 30.dp)
+    ) {
+        Column(modifier = Modifier.verticalScroll(rememberScrollState())
         ) {
-            Text(text = textoBotao, color = Color.White, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(35.dp))
+            Text(
+                text = "Cadastrar/Atualizar Cliente",
+                modifier = Modifier.fillMaxWidth(),
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF1A1A1A)  // Cor mais suave para o título
+            )
+            Spacer(modifier = Modifier.height(25.dp))
+
+            // Campo para Nome
+            TextField(
+                value = nome,
+                onValueChange = { nome = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),  // Adiciona padding lateral
+                label = { Text(text = "Nome") },
+                colors = TextFieldDefaults.textFieldColors(
+                    focusedIndicatorColor = Color(0xFF1A1A1A),
+                    unfocusedIndicatorColor = Color(0xFFBDBDBD),
+                    focusedLabelColor = Color(0xFF1A1A1A),
+                    unfocusedLabelColor = Color(0xFF757575),
+                ),
+                shape = MaterialTheme.shapes.medium,
+                singleLine = true,
+                textStyle = TextStyle(
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.Black
+                )
+            )
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            // Campo para CPF
+            TextField(
+                value = cpf,
+                onValueChange = { cpf = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                label = { Text(text = "CPF") },
+                colors = TextFieldDefaults.textFieldColors(
+                    focusedIndicatorColor = Color(0xFF1A1A1A),
+                    unfocusedIndicatorColor = Color(0xFFBDBDBD),
+                    focusedLabelColor = Color(0xFF1A1A1A),
+                    unfocusedLabelColor = Color(0xFF757575),
+                ),
+                shape = MaterialTheme.shapes.medium,
+                singleLine = true,
+                textStyle = TextStyle(
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.Black
+                )
+            )
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            // Campo para RG
+            TextField(
+                value = rg,
+                onValueChange = { rg = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                label = { Text(text = "RG") },
+                colors = TextFieldDefaults.textFieldColors(
+                    focusedIndicatorColor = Color(0xFF1A1A1A),
+                    unfocusedIndicatorColor = Color(0xFFBDBDBD),
+                    focusedLabelColor = Color(0xFF1A1A1A),
+                    unfocusedLabelColor = Color(0xFF757575),
+                ),
+                shape = MaterialTheme.shapes.medium,
+                singleLine = true,
+                textStyle = TextStyle(
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.Black
+                )
+            )
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            // Campo para CEP
+            TextField(
+                value = cep,
+                onValueChange = { cep = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                label = { Text(text = "CEP") },
+                colors = TextFieldDefaults.textFieldColors(
+                    focusedIndicatorColor = Color(0xFF1A1A1A),
+                    unfocusedIndicatorColor = Color(0xFFBDBDBD),
+                    focusedLabelColor = Color(0xFF1A1A1A),
+                    unfocusedLabelColor = Color(0xFF757575),
+                ),
+                shape = MaterialTheme.shapes.medium,
+                singleLine = true,
+                textStyle = TextStyle(
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.Black
+                )
+            )
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            // Campo para Endereço
+            TextField(
+                value = endereco,
+                onValueChange = { endereco = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                label = { Text(text = "Endereço") },
+                colors = TextFieldDefaults.textFieldColors(
+                    focusedIndicatorColor = Color(0xFF1A1A1A),
+                    unfocusedIndicatorColor = Color(0xFFBDBDBD),
+                    focusedLabelColor = Color(0xFF1A1A1A),
+                    unfocusedLabelColor = Color(0xFF757575),
+                ),
+                shape = MaterialTheme.shapes.medium,
+                singleLine = true,
+                textStyle = TextStyle(
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.Black
+                )
+            )
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            // Campo para Bairro
+            TextField(
+                value = bairro,
+                onValueChange = { bairro = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                label = { Text(text = "Bairro") },
+                colors = TextFieldDefaults.textFieldColors(
+                    focusedIndicatorColor = Color(0xFF1A1A1A),
+                    unfocusedIndicatorColor = Color(0xFFBDBDBD),
+                    focusedLabelColor = Color(0xFF1A1A1A),
+                    unfocusedLabelColor = Color(0xFF757575),
+                ),
+                shape = MaterialTheme.shapes.medium,
+                singleLine = true,
+                textStyle = TextStyle(
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.Black
+                )
+            )
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            // Campo para Cidade
+            TextField(
+                value = cidade,
+                onValueChange = { cidade = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                label = { Text(text = "Cidade") },
+                colors = TextFieldDefaults.textFieldColors(
+                    focusedIndicatorColor = Color(0xFF1A1A1A),
+                    unfocusedIndicatorColor = Color(0xFFBDBDBD),
+                    focusedLabelColor = Color(0xFF1A1A1A),
+                    unfocusedLabelColor = Color(0xFF757575),
+                ),
+                shape = MaterialTheme.shapes.medium,
+                singleLine = true,
+                textStyle = TextStyle(
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.Black
+                )
+            )
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            // Campo para Telefone
+            TextField(
+                value = telefone,
+                onValueChange = { telefone = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                label = { Text(text = "Telefone") },
+                colors = TextFieldDefaults.textFieldColors(
+                    focusedIndicatorColor = Color(0xFF1A1A1A),
+                    unfocusedIndicatorColor = Color(0xFFBDBDBD),
+                    focusedLabelColor = Color(0xFF1A1A1A),
+                    unfocusedLabelColor = Color(0xFF757575),
+                ),
+                shape = MaterialTheme.shapes.medium,
+                singleLine = true,
+                textStyle = TextStyle(
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.Black
+                )
+            )
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            // Botão de salvar/atualizar
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .padding(horizontal = 60.dp)
+                    .padding(vertical = 5.dp),
+                onClick = {
+                    val retorno: String? = if (modoEditar) {
+                        clienteTemp?.let {
+                            clienteViewModel.atualizarCliente(it.id, nome, cpf, rg, cep, endereco, bairro, cidade, telefone).also {
+                                modoEditar = false
+                                textoBotao = "Salvar"
+                            }
+                        }
+                    } else {
+                        clienteViewModel.salvarCliente(nome, cpf, rg, cep, endereco, bairro, cidade, telefone)
+                    }
+
+                    Toast.makeText(context, retorno, Toast.LENGTH_LONG).show()
+
+                    nome = ""
+                    cpf = ""
+                    rg = ""
+                    cep = ""
+                    endereco = ""
+                    bairro = ""
+                    cidade = ""
+                    telefone = ""
+                    focusManager.clearFocus()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF4CAF50), // Cor de fundo verde
+                    contentColor = Color.White // Cor do texto branco
+                ),
+                shape = MaterialTheme.shapes.small  // Bordas arredondadas pequenas
+            ) {
+                Text(text = textoBotao, color = Color.White, fontWeight = FontWeight.Bold)
+            }
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            Text(text = "Lista de Cliente",
+                modifier = Modifier.fillMaxWidth(),
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF1A1A1A))
         }
-
-        Spacer(modifier = Modifier.height(15.dp))
-
-        Text(text = "Lista de Cliente",
-            modifier = Modifier.fillMaxWidth(),
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF1A1A1A))
 
         // Lista de clientes
         LazyColumn {
