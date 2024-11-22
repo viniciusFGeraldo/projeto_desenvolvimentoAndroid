@@ -22,7 +22,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -30,7 +29,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -41,22 +39,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.sgos.model.entity.Cliente
-import com.example.sgos.model.entity.Funcionario
 import com.example.sgos.model.entity.OrdemServico
-import com.example.sgos.model.entity.Produto
 import com.example.sgos.model.entity.Status
 import com.example.sgos.viewmodel.ClienteViewModel
 import com.example.sgos.viewmodel.FuncionarioViewModel
 import com.example.sgos.viewmodel.OrdemServicoViewModel
 import com.example.sgos.viewmodel.ProdutoViewModel
 import com.google.gson.Gson
+import java.text.DateFormat
 
 
 @Composable
@@ -73,7 +68,7 @@ fun ListaOrdemServico(
     val listaProdutos by produtoViewModel.listaProdutos
     val listaFuncionarios by funcionarioViewModel.listaFuncionarios
 
-    var ordemServicoExcluir by remember { mutableStateOf<OrdemServico?>(null) }
+    val ordemServicoExcluir by remember { mutableStateOf<OrdemServico?>(null) }
     var mostrarCaixaDialogo by remember { mutableStateOf(false) }
 
     // Caixa de diálogo para confirmação de exclusão
@@ -87,33 +82,59 @@ fun ListaOrdemServico(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(25.dp),
+            .padding(25.dp, 50.dp, 25.dp, 30.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Botões superiores
-        if (!modoSolicitacaoBaixa) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Button(onClick = { navController.navigate("listaSolicitacoesBaixa") }) {
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Button(onClick = { navController.popBackStack() }, modifier = Modifier.weight(1.2f)) {
+                Text("Voltar")
+            }
+
+            if (!modoSolicitacaoBaixa) {
+                Spacer(modifier = Modifier.weight(0.3f))
+
+                Button(onClick = { navController.navigate("listaSolicitacoesBaixa") }, modifier = Modifier.weight(2f)) {
                     Text("Solicitações de Baixas")
                 }
-                Button(onClick = { navController.navigate("cadastroOrdemServico") }) {
+
+                Spacer(modifier = Modifier.weight(0.3f))
+
+                Button(onClick = { navController.navigate("cadastroOrdemServico") },modifier = Modifier.weight(1.5f)) {
                     Text("Cadastrar")
                 }
             }
-        } else {
-            Button(onClick = { navController.popBackStack() }) {
-                Text("Voltar")
-            }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(30.dp))
 
-        // Lista de ordens de serviço
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            item{
+                Text(text = "${if(modoSolicitacaoBaixa) "Lista de Solicitações de Baixa" else "Lista de Ordem de Serviço"} ",
+                    modifier = Modifier.fillMaxWidth(),
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1A1A1A))
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                if(listaOrdemServico.isEmpty()){
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(75.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+
+                    ) {
+                        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally)
+                        {
+                            Text(text = "Não há nenhuma ordem de serviço ${if(modoSolicitacaoBaixa) "que foi solicitado baixa" else "cadastrada"}", fontSize = 20.sp)
+                        }
+                    }
+                }
+            }
             items(listaOrdemServico) { ordemServico ->
                 if ((!modoSolicitacaoBaixa && ordemServico.status != Status.SOLICITADO_BAIXA) ||
                     (modoSolicitacaoBaixa && ordemServico.status == Status.SOLICITADO_BAIXA)
@@ -132,7 +153,6 @@ fun ListaOrdemServico(
                         onClick = {
                             navController.navigate("mostrarInformacaoOS/${ordemServico.id}")
                         }
-
                     ) {
                         Column(
                             modifier = Modifier
@@ -167,7 +187,7 @@ fun ListaOrdemServico(
 }
 
 @Composable
-fun formOrdemServico(
+fun FormOrdemServico(
     modoEditar: Boolean,
     ordemServico: OrdemServico?,
     ordemServicoViewModel: OrdemServicoViewModel,
@@ -185,15 +205,14 @@ fun formOrdemServico(
     var observacoes by remember { mutableStateOf(if(modoEditar) "${ordemServico?.observacoes}" else "") }
 
     val context = LocalContext.current
-    val focusManager = LocalFocusManager.current
 
     val listaClientes by clienteViewModel.listaClientes
     val listaProdutos by produtoViewModel.listaProdutos
     val listaFuncionarios by funcionarioViewModel.listaFuncionarios
 
-    var clienteSelecionado by remember { mutableStateOf<Cliente?>(if(modoEditar) listaClientes.find { it.id == ordemServico?.clienteId ?: null } else null ) }
-    var produtoSelecionado by remember { mutableStateOf<Produto?>(if(modoEditar) listaProdutos.find { it.id == ordemServico?.produtoId ?: null } else null ) }
-    var funcionarioSelecionado by remember { mutableStateOf<Funcionario?>(if(modoEditar) listaFuncionarios.find { it.id == ordemServico?.funcionarioId ?: null } else null ) }
+    var clienteSelecionado by remember { mutableStateOf(if(modoEditar) listaClientes.find { it.id == ordemServico?.clienteId } else null ) }
+    var produtoSelecionado by remember { mutableStateOf(if(modoEditar) listaProdutos.find { it.id == ordemServico?.produtoId } else null ) }
+    var funcionarioSelecionado by remember { mutableStateOf(if(modoEditar) listaFuncionarios.find { it.id == ordemServico?.funcionarioId } else null ) }
 
     // Atualização automática dos cálculos
     LaunchedEffect(largura, altura, valorM2, quantidade) {
@@ -338,6 +357,12 @@ fun formOrdemServico(
                             produtoSelecionado!!.id
                         )
                     }
+
+                    Toast.makeText(
+                        context,
+                        retorno,
+                        Toast.LENGTH_LONG
+                    ).show()
                     navController.popBackStack()
                 }
             },
@@ -463,7 +488,7 @@ fun MostrarInformacaoOS(
 
     if (mostrarCaixaDialogo) {
         ExcluirOrdemServico(onConfirm = {
-            ordemServico?.let { ordemServicoViewModel.excluirOrdemServico(it) }
+            ordemServico.let { ordemServicoViewModel.excluirOrdemServico(it) }
 
             mostrarCaixaDialogo = false
             Toast.makeText(
@@ -472,7 +497,7 @@ fun MostrarInformacaoOS(
                 Toast.LENGTH_LONG
             ).show()
 
-            navController.popBackStack();
+            navController.popBackStack()
         }, onDismiss = { mostrarCaixaDialogo = false })
     }
 
@@ -520,12 +545,12 @@ fun MostrarInformacaoOS(
 
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(text = "Observações:", fontWeight = FontWeight.Bold)
-                    Text(text = "${ordemServico.observacoes}", style = MaterialTheme.typography.bodyMedium)
+                    Text(text = ordemServico.observacoes, style = MaterialTheme.typography.bodyMedium)
 
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Data e Hora de Abertura: ${
-                            ordemServico.dataHorarioAbertura.toLocaleString()
+                            DateFormat.getDateInstance().format(ordemServico.dataHorarioAbertura)
                         }"
                     )
                 }
@@ -537,67 +562,64 @@ fun MostrarInformacaoOS(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 20.dp), // Espaço do rodapé
+                .padding(bottom = 50.dp), // Espaço do rodapé
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-
-            when(ordemServico.status){
-                Status.SOLICITADO_BAIXA ->{
-
-                }
-
-                Status.BAIXADA -> {
-
-                }
-                else ->{
-
-                }
-            }
-
-
             Button(
                 onClick = {
                     mostrarCaixaDialogo = true
                 },
                 colors = ButtonDefaults.buttonColors(Color.Red),
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(end = 8.dp)
+                modifier = Modifier.weight(1f)
             ) {
                 Text("Excluir", color = Color.White)
             }
 
             if(ordemServico.status != Status.BAIXADA){
+                Spacer(modifier = Modifier.weight(0.25f));
+
                 Button(
                     onClick = {
-                        val osJson = Gson().toJson(ordemServico);
                         navController.navigate("editarOrdemSerivo/${Gson().toJson(ordemServico)}")
                     },
                     colors = ButtonDefaults.buttonColors(Color.Blue),
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 8.dp)
+                    modifier = Modifier.weight(1f)
                 ) {
                     Text("Editar", color = Color.White)
                 }
+                Spacer(modifier = Modifier.weight(0.25f));
+            }
 
-                if(ordemServico.status != Status.SOLICITADO_BAIXA) {
+            when{
+                ordemServico.status == Status.PRONTO_PARA_ENTREGA -> {
                     Button(onClick = {
+                            ordemServicoViewModel.atualizarStatus(ordemServico)
+                            navController.popBackStack();
+                        },
+                        modifier = Modifier.weight(1.5f)
+                    ) {
+                            Text("Solicitar Baixa")
+
+                    }
+                }
+
+                ordemServico.status == Status.SOLICITADO_BAIXA -> {
+                    Button(modifier = Modifier.weight(1.5f),
+                        onClick = {
+                        ordemServicoViewModel.atualizarStatus(ordemServico)
+                    }) {
+                        Text("Baixar")
+                    }
+                }
+
+                ordemServico.status == Status.BAIXADA -> {}
+
+                else ->{
+                    Button(modifier = Modifier.weight(1.5f),
+                        onClick = {
                         ordemServicoViewModel.atualizarStatus(ordemServico)
                     }) {
                         Text("Atualizar Status")
-                    }
-                }else{
-                    Button(onClick = {
-                        ordemServicoViewModel.atualizarStatus(ordemServico);
-
-                        Toast.makeText(
-                            context,
-                            "Solicitado Baixa de Ordem de Serviço",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }) {
-                        Text("Solicitar Baixa")
                     }
                 }
             }

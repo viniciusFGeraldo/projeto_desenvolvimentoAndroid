@@ -15,11 +15,9 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,10 +36,6 @@ import androidx.navigation.NavController
 import com.example.sgos.model.entity.Funcionario
 import com.example.sgos.viewmodel.FuncionarioViewModel
 
-
-//TELAS DE FUNCIONARIO
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListaFuncionarios(funcionarioViewModel: FuncionarioViewModel, navController: NavController) {
     var nome by remember { mutableStateOf("") }
@@ -50,7 +44,7 @@ fun ListaFuncionarios(funcionarioViewModel: FuncionarioViewModel, navController:
     var textoBotao by remember { mutableStateOf("Salvar") }
     var modoEditar by remember { mutableStateOf(false) }
 
-    var listaFuncionarios by funcionarioViewModel.listaFuncionarios
+    val listaFuncionarios by funcionarioViewModel.listaFuncionarios
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
@@ -84,12 +78,6 @@ fun ListaFuncionarios(funcionarioViewModel: FuncionarioViewModel, navController:
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
             label = { Text(text = "Nome do Funcionário") },
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = Color(0xFF1A1A1A),
-                unfocusedIndicatorColor = Color(0xFFBDBDBD),
-                focusedLabelColor = Color(0xFF1A1A1A),
-                unfocusedLabelColor = Color(0xFF757575),
-            ),
             shape = MaterialTheme.shapes.medium,
             singleLine = true,
             textStyle = TextStyle(
@@ -109,12 +97,6 @@ fun ListaFuncionarios(funcionarioViewModel: FuncionarioViewModel, navController:
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
             label = { Text(text = "Telefone") },
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = Color(0xFF1A1A1A),
-                unfocusedIndicatorColor = Color(0xFFBDBDBD),
-                focusedLabelColor = Color(0xFF1A1A1A),
-                unfocusedLabelColor = Color(0xFF757575),
-            ),
             shape = MaterialTheme.shapes.medium,
             singleLine = true,
             textStyle = TextStyle(

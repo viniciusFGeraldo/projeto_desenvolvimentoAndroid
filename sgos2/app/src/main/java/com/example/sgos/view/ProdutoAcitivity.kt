@@ -1,7 +1,6 @@
 package com.example.sgos.view
 
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,7 +22,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,9 +43,6 @@ import com.example.sgos.viewmodel.AcabamentoViewModel
 import com.example.sgos.viewmodel.EquipamentoViewModel
 import com.example.sgos.viewmodel.ProdutoViewModel
 
-
-//TELAS DE PRODUTO
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListaProdutos(
     produtoViewModel: ProdutoViewModel,
@@ -63,9 +58,9 @@ fun ListaProdutos(
     var textoBotao by remember { mutableStateOf("Salvar") }
     var modoEditar by remember { mutableStateOf(false) }
 
-    var listaProdutos by produtoViewModel.listaProdutos
-    var listaAcabamentos by acabamentoViewModel.listaAcabamentos
-    var listaEquipamentos by equipamentoViewModel.listaEquipamentos
+    val listaProdutos by produtoViewModel.listaProdutos
+    val listaAcabamentos by acabamentoViewModel.listaAcabamentos
+    val listaEquipamentos by equipamentoViewModel.listaEquipamentos
 
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -109,12 +104,6 @@ fun ListaProdutos(
             onValueChange = { nome = it },
             modifier = Modifier.fillMaxWidth(),
             label = { Text(text = "Nome do Produto") },
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = Color(0xFF4CAF50),
-                unfocusedIndicatorColor = Color(0xFFBDBDBD),
-                focusedLabelColor = Color(0xFF4CAF50),
-                unfocusedLabelColor = Color(0xFF757575),
-            ),
             shape = MaterialTheme.shapes.medium,
             singleLine = true
         )
@@ -127,12 +116,6 @@ fun ListaProdutos(
             onValueChange = { descricao = it },
             modifier = Modifier.fillMaxWidth(),
             label = { Text(text = "Descrição do Produto") },
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = Color(0xFF4CAF50),
-                unfocusedIndicatorColor = Color(0xFFBDBDBD),
-                focusedLabelColor = Color(0xFF4CAF50),
-                unfocusedLabelColor = Color(0xFF757575),
-            ),
             shape = MaterialTheme.shapes.medium,
             singleLine = true
         )

@@ -27,6 +27,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.sgos.model.database.AppDatabase
+import com.example.sgos.model.entity.Cliente
 import com.example.sgos.model.entity.OrdemServico
 import com.example.sgos.viewmodel.AcabamentoViewModel
 import com.example.sgos.viewmodel.AcabamentoViewModelFactory
@@ -92,13 +93,21 @@ fun AppNavigation(
     ordemServicoViewModel: OrdemServicoViewModel
 ) {
     val navController = rememberNavController()
-    val context = LocalContext.current;
+    val context = LocalContext.current
 
     NavHost(navController = navController, startDestination = "telaInicial") {
         composable("telaInicial") { TelaInicial(navController) }
         composable("menuCadastros") { MenuCadastros(navController) }
         composable("listaAcabamento") { ListaAcabamento(acabamentoViewModel, navController) }
         composable("listaClientes") { ListaClientes(clienteViewModel, navController) }
+        composable("cadastrarCliente") {
+            FormClientes(false, clienteViewModel, navController, null)
+        }
+        composable("editarCliente/{clienteJson}") { backStackEntry ->
+            val clienteJson = backStackEntry.arguments?.getString("clienteJson")
+            val cliente = Gson().fromJson(clienteJson, Cliente::class.java)
+            FormClientes(true, clienteViewModel, navController, cliente)
+        }
         composable("listaEquipamentos") { ListaEquipamentos(equipamentoViewModel, navController) }
         composable("listaFuncionarios") { ListaFuncionarios(funcionarioViewModel, navController) }
         composable("listaProdutos") { ListaProdutos(produtoViewModel, acabamentoViewModel, equipamentoViewModel, navController) }
@@ -107,9 +116,9 @@ fun AppNavigation(
         composable("editarOrdemSerivo/{osJson}"){ backStackEntry ->
             val osJson = backStackEntry.arguments?.getString("osJson")
             val os = Gson().fromJson(osJson, OrdemServico::class.java)
-            formOrdemServico(true, os, ordemServicoViewModel, clienteViewModel, produtoViewModel, funcionarioViewModel, navController)
+            FormOrdemServico(true, os, ordemServicoViewModel, clienteViewModel, produtoViewModel, funcionarioViewModel, navController)
         }
-        composable("cadastroOrdemServico") { formOrdemServico(false, null, ordemServicoViewModel, clienteViewModel, produtoViewModel, funcionarioViewModel, navController) }
+        composable("cadastroOrdemServico") { FormOrdemServico(false, null, ordemServicoViewModel, clienteViewModel, produtoViewModel, funcionarioViewModel, navController) }
         composable("solicitacaoDeBaixa/{osJson}") {backStackEntry ->
             val osJson = backStackEntry.arguments?.getString("osJson")
             val os = Gson().fromJson(osJson, OrdemServico::class.java)
@@ -121,9 +130,7 @@ fun AppNavigation(
             if(os != null){
                 MostrarInformacaoOS(os, navController, ordemServicoViewModel, produtoViewModel,  clienteViewModel, funcionarioViewModel, context)
             }
-
         }
-
     }
 }
 

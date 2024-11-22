@@ -32,7 +32,7 @@ class AcabamentoViewModel(private val acabamentoDao: AcabamentoDao): ViewModel()
         }
 
         // cria objeto do tipo acabamento
-        var acabamento = Acabamento(0, criadoEm = Date(),nome, descricao)
+        val acabamento = Acabamento(0, criadoEm = Date(),nome, descricao)
 
         // adicionar este acabamento na tabela de acabamentos
         viewModelScope.launch {
@@ -59,9 +59,9 @@ class AcabamentoViewModel(private val acabamentoDao: AcabamentoDao): ViewModel()
             return ("Ao editar, preencha todos os dados do acabamento!")
         }
 
-        var acabamento = listaAcabamentos.value.find { it.id == id } ?: return "Erro ao atualizar acabamento"
+        val acabamento = listaAcabamentos.value.find { it.id == id } ?: return "Erro ao atualizar acabamento"
 
-        var acabamentoAtualizado = acabamento.copy(nome = nome, descricao = descricao)
+        val acabamentoAtualizado = acabamento.copy(nome = nome, descricao = descricao)
 
         viewModelScope.launch{
             acabamentoDao.atualizar(acabamentoAtualizado)

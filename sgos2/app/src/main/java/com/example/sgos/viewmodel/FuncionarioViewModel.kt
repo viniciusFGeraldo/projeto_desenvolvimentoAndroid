@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sgos.model.Validacao
 import com.example.sgos.model.database.dao.FuncionarioDao
-import com.example.sgos.model.entity.Equipamento
 import com.example.sgos.model.entity.Funcionario
 import kotlinx.coroutines.launch
 import java.util.Date
@@ -33,7 +32,7 @@ class FuncionarioViewModel(private var funcionarioDao: FuncionarioDao): ViewMode
         }
 
         // cria objeto do tipo Funcionario
-        var funcionario = Funcionario(0, nome, telefone, criadoEm = Date())
+        val funcionario = Funcionario(0, nome, telefone, criadoEm = Date())
 
         // adicionar este Funcionario na tabela de Funcionarios
         viewModelScope.launch {
@@ -60,9 +59,9 @@ class FuncionarioViewModel(private var funcionarioDao: FuncionarioDao): ViewMode
             return ("Ao editar, preencha todos os dados do Funcionario!")
         }
 
-        var funcionario = listaFuncionarios.value.find { it.id == id } ?: return "Erro ao atualizar Funcionario"
+        val funcionario = listaFuncionarios.value.find { it.id == id } ?: return "Erro ao atualizar Funcionario"
 
-        var funcionarioAtualizado = funcionario.copy(nome = nome, telefone = telefone)
+        val funcionarioAtualizado = funcionario.copy(nome = nome, telefone = telefone)
 
         viewModelScope.launch{
             funcionarioDao.atualizar(funcionarioAtualizado)

@@ -4,7 +4,6 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.ForeignKey
 import androidx.room.ColumnInfo
-import androidx.room.TypeConverters
 import java.util.Date
 
 @Entity(
@@ -43,7 +42,6 @@ data class OrdemServico(
     val valorAPagar: Float,
     val observacoes: String,
     val dataHorarioAbertura: Date = Date(),
-    @TypeConverters(StatusConverter::class)
     val status: Status,
 
     @ColumnInfo(name = "clienteId")
@@ -56,12 +54,12 @@ data class OrdemServico(
     val produtoId: Int
 )
 
-enum class Status(val statusCode: Int) {
-    EM_PRODUCAO(0),
-    EM_ACABAMENTO(1),
-    PRONTO_PARA_ENTREGA(2),
-    SOLICITADO_BAIXA(3),
-    BAIXADA(4);
+enum class Status {
+    EM_PRODUCAO,
+    EM_ACABAMENTO,
+    PRONTO_PARA_ENTREGA,
+    SOLICITADO_BAIXA,
+    BAIXADA;
 
     fun nextStatus(): Status {
         return when (this) {
@@ -73,17 +71,3 @@ enum class Status(val statusCode: Int) {
         }
     }
 }
-
-// TypeConverter para Status (caso o Room não lide com enum diretamente)
-class StatusConverter {
-    @androidx.room.TypeConverter
-    fun fromStatus(status: Status): Int {
-        return status.statusCode
-    }
-
-    @androidx.room.TypeConverter
-    fun toStatus(statusCode: Int): Status {
-        return Status.values().first { it.statusCode == statusCode }
-    }
-}
-

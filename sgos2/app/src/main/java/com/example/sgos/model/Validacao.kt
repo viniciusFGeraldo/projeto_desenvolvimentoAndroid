@@ -3,11 +3,6 @@ package com.example.sgos.model
 abstract class Validacao {
 
     companion object {
-        private var id = 0
-
-        fun getId(): Int{
-            return id++
-        }
 
         fun haCamposEmBranco(nome : String,descricao:String) : Boolean{
             return nome.isBlank() || descricao.isBlank()

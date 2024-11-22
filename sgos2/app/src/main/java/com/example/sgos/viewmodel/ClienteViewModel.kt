@@ -4,8 +4,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sgos.model.Validacao
-import com.example.sgos.model.database.dao.AcabamentoDao
-import com.example.sgos.model.entity.Acabamento
 import com.example.sgos.model.entity.Cliente
 import com.example.sgos.model.database.dao.ClienteDao
 import kotlinx.coroutines.launch
@@ -34,7 +32,7 @@ class ClienteViewModel(private val clienteDao: ClienteDao): ViewModel() {
         }
 
         // cria objeto do tipo cliente
-        var cliente = Cliente(0, dataCadastro = Date(), nome, cpf, rg, cep, endereco, bairro, cidade, telefone)
+        val cliente = Cliente(0, dataCadastro = Date(), nome, cpf, rg, cep, endereco, bairro, cidade, telefone)
 
         // adicionar este cliente na tabela de clientes
         viewModelScope.launch {
@@ -61,9 +59,9 @@ class ClienteViewModel(private val clienteDao: ClienteDao): ViewModel() {
             return ("Ao editar, preencha todos os dados do cliente!")
         }
 
-        var cliente = listaClientes.value.find { it.id == id } ?: return "Erro ao atualizar cliente"
+        val cliente = listaClientes.value.find { it.id == id } ?: return "Erro ao atualizar cliente"
 
-        var clienteAtualizado = cliente.copy(nome = nome, cpf = cpf, rg = rg, cep = cep, endereco = endereco, bairro = bairro, cidade = cidade, telefone = telefone)
+        val clienteAtualizado = cliente.copy(nome = nome, cpf = cpf, rg = rg, cep = cep, endereco = endereco, bairro = bairro, cidade = cidade, telefone = telefone)
 
         viewModelScope.launch{
             clienteDao.atualizar(clienteAtualizado)

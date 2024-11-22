@@ -5,8 +5,6 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.sgos.model.database.dao.AcabamentoDao
 import com.example.sgos.model.database.dao.ClienteDao
 import com.example.sgos.model.database.dao.EquipamentoDao

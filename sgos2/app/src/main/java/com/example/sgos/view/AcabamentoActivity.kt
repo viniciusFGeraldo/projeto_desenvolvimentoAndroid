@@ -1,6 +1,5 @@
 package com.example.sgos.view
 
-import android.text.style.BackgroundColorSpan
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,18 +9,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,7 +36,6 @@ import androidx.navigation.NavController
 import com.example.sgos.model.entity.Acabamento
 import com.example.sgos.viewmodel.AcabamentoViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListaAcabamento(acabamentoViewModel: AcabamentoViewModel, navController: NavController) {
     var nome by remember { mutableStateOf("") }
@@ -49,7 +44,7 @@ fun ListaAcabamento(acabamentoViewModel: AcabamentoViewModel, navController: Nav
     var textoBotao by remember { mutableStateOf("Salvar") }
     var modoEditar by remember { mutableStateOf(false) }
 
-    var listaAcabamento by acabamentoViewModel.listaAcabamentos
+    val listaAcabamento by acabamentoViewModel.listaAcabamentos
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
@@ -84,13 +79,6 @@ fun ListaAcabamento(acabamentoViewModel: AcabamentoViewModel, navController: Nav
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),  // Adiciona padding lateral
             label = { Text(text = "Nome do acabamento") },
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = Color(0xFF1A1A1A),  // Cor verde para o indicador de foco
-                unfocusedIndicatorColor = Color(0xFFBDBDBD),  // Cor cinza para o indicador fora de foco
-                focusedLabelColor = Color(0xFF1A1A1A),  // Cor verde para o label quando em foco
-                unfocusedLabelColor = Color(0xFF757575),  // Cor cinza para o label quando não está em foco
-
-            ),
             shape = MaterialTheme.shapes.medium,  // Bordas arredondadas médias
             singleLine = true,  // Impede múltiplas linhas
             textStyle = TextStyle(
@@ -110,12 +98,6 @@ fun ListaAcabamento(acabamentoViewModel: AcabamentoViewModel, navController: Nav
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
             label = { Text(text = "Descrição do acabamento") },
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = Color(0xFF1A1A1A),  // Cor verde para o indicador de foco
-                unfocusedIndicatorColor = Color(0xFFBDBDBD),  // Cor cinza para o indicador fora de foco
-                focusedLabelColor = Color(0xFF1A1A1A),  // Cor verde para o label quando em foco
-                unfocusedLabelColor = Color(0xFF757575),  // Cor cinza para o label quando não está em foco
-            ),
             shape = MaterialTheme.shapes.medium,  // Bordas arredondadas médias
             singleLine = true,  // Impede múltiplas linhas
             textStyle = TextStyle(
