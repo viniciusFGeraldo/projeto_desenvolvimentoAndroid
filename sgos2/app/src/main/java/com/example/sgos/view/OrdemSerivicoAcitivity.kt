@@ -61,7 +61,8 @@ fun ListaOrdemServico(
     clienteViewModel: ClienteViewModel,
     produtoViewModel: ProdutoViewModel,
     funcionarioViewModel: FuncionarioViewModel,
-    navController: NavController
+    navController: NavController,
+    context: Context
 ) {
     val listaOrdemServico by ordemServicoViewModel.listaOrdemServico
     val listaClientes by clienteViewModel.listaClientes
@@ -102,7 +103,15 @@ fun ListaOrdemServico(
 
                 Spacer(modifier = Modifier.weight(0.3f))
 
-                Button(onClick = { navController.navigate("cadastroOrdemServico") },modifier = Modifier.weight(1.5f)) {
+                Button(
+                    onClick = {
+                        if(listaClientes.isEmpty() || listaFuncionarios.isEmpty() || listaProdutos.isEmpty()){
+                            Toast.makeText(context, "Primeiro faça cadastro de pelo menos um: cliente, funcionário e produto para acessar essa página", Toast.LENGTH_LONG).show()
+                        }else {
+                            navController.navigate("cadastroOrdemServico")
+                        }
+                    },
+                    modifier = Modifier.weight(1.5f)) {
                     Text("Cadastrar")
                 }
             }
@@ -120,7 +129,7 @@ fun ListaOrdemServico(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                if(listaOrdemServico.isEmpty()){
+                if((!modoSolicitacaoBaixa && listaOrdemServico.filter{it.status != Status.SOLICITADO_BAIXA}.isEmpty()) || (modoSolicitacaoBaixa && listaOrdemServico.filter { it.status == Status.SOLICITADO_BAIXA }.isEmpty())){
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -231,7 +240,7 @@ fun FormOrdemServico(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(10.dp, 30.dp, 10.dp, 30.dp)
+            .padding(25.dp, 50.dp, 25.dp, 30.dp)
             .size(100.dp)
             .verticalScroll(rememberScrollState())
     ) {

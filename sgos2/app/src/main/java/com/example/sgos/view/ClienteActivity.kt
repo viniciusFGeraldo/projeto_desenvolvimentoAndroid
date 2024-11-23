@@ -9,15 +9,23 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -25,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -36,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.sgos.model.entity.Cliente
+import com.example.sgos.model.entity.Status
 import com.example.sgos.viewmodel.ClienteViewModel
 import com.google.gson.Gson
 
@@ -56,7 +66,7 @@ fun FormClientes(modoEditar: Boolean, clienteViewModel: ClienteViewModel, navCon
 
     Column(modifier = Modifier
         .fillMaxSize()
-        .padding(10.dp, 30.dp, 10.dp, 30.dp)
+        .padding(25.dp, 50.dp, 25.dp, 30.dp)
         .verticalScroll(rememberScrollState())
     ) {
         Spacer(modifier = Modifier.height(35.dp))
@@ -74,8 +84,7 @@ fun FormClientes(modoEditar: Boolean, clienteViewModel: ClienteViewModel, navCon
             value = nome,
             onValueChange = { nome = it },
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .fillMaxWidth(),
             label = { Text(text = "Nome") },
             shape = MaterialTheme.shapes.medium,
             singleLine = true,
@@ -92,8 +101,7 @@ fun FormClientes(modoEditar: Boolean, clienteViewModel: ClienteViewModel, navCon
             value = cpf,
             onValueChange = { cpf = it },
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .fillMaxWidth(),
             label = { Text(text = "CPF") },
             shape = MaterialTheme.shapes.medium,
             singleLine = true,
@@ -110,8 +118,7 @@ fun FormClientes(modoEditar: Boolean, clienteViewModel: ClienteViewModel, navCon
             value = rg,
             onValueChange = { rg = it },
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .fillMaxWidth(),
             label = { Text(text = "RG") },
             shape = MaterialTheme.shapes.medium,
             singleLine = true,
@@ -128,8 +135,7 @@ fun FormClientes(modoEditar: Boolean, clienteViewModel: ClienteViewModel, navCon
             value = cep,
             onValueChange = { cep = it },
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .fillMaxWidth(),
             label = { Text(text = "CEP") },
             shape = MaterialTheme.shapes.medium,
             singleLine = true,
@@ -146,8 +152,7 @@ fun FormClientes(modoEditar: Boolean, clienteViewModel: ClienteViewModel, navCon
             value = endereco,
             onValueChange = { endereco = it },
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .fillMaxWidth(),
             label = { Text(text = "Endereço") },
             shape = MaterialTheme.shapes.medium,
             singleLine = true,
@@ -164,8 +169,7 @@ fun FormClientes(modoEditar: Boolean, clienteViewModel: ClienteViewModel, navCon
             value = bairro,
             onValueChange = { bairro = it },
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .fillMaxWidth(),
             label = { Text(text = "Bairro") },
             shape = MaterialTheme.shapes.medium,
             singleLine = true,
@@ -182,8 +186,7 @@ fun FormClientes(modoEditar: Boolean, clienteViewModel: ClienteViewModel, navCon
             value = cidade,
             onValueChange = { cidade = it },
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .fillMaxWidth(),
             label = { Text(text = "Cidade") },
             shape = MaterialTheme.shapes.medium,
             singleLine = true,
@@ -200,8 +203,7 @@ fun FormClientes(modoEditar: Boolean, clienteViewModel: ClienteViewModel, navCon
             value = telefone,
             onValueChange = { telefone = it },
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .fillMaxWidth(),
             label = { Text(text = "Telefone") },
             shape = MaterialTheme.shapes.medium,
             singleLine = true,
@@ -217,9 +219,7 @@ fun FormClientes(modoEditar: Boolean, clienteViewModel: ClienteViewModel, navCon
         Button(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp)
-                .padding(horizontal = 60.dp)
-                .padding(vertical = 5.dp),
+                .height(50.dp),
             onClick = {
                 val retorno: String? = if (modoEditar) {
                     cliente?.let { clienteViewModel.atualizarCliente(it.id, nome, cpf, rg, cep, endereco, bairro, cidade, telefone) }
@@ -273,30 +273,32 @@ fun ListaClientes(clienteViewModel: ClienteViewModel, navController: NavControll
     Column (
         modifier = Modifier
             .fillMaxSize()
-            .padding(10.dp, 60.dp, 10.dp, 30.dp)
+            .padding(25.dp, 50.dp, 25.dp, 30.dp)
     ){
-
-        Row(
-            modifier = Modifier.fillMaxWidth()
-        ){
-            Text(text = "Lista de Cliente",
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF1A1A1A))
-
-            Spacer(modifier = Modifier.weight(1f))
-            Button(
-                onClick = {
-                    navController.navigate("cadastrarCliente")
-                }
-            ) {
-                Text(text = "Cadastrar", color = Color.White, fontWeight = FontWeight.Bold)
-            }
-        }
-
-        Spacer(modifier = Modifier.height(15.dp))
-
         LazyColumn {
+            item{
+                Text(text = "Lista de Clientes",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1A1A1A))
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                if(listaClientes.isEmpty()){
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(75.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+
+                        ) {
+                        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally)
+                        {
+                            Text(text = "Não há nenhum cliente cadastrado", fontSize = 20.sp)
+                        }
+                    }
+                }
+            }
             items(listaClientes) { cliente ->
                 Card(
                     modifier = Modifier
@@ -352,7 +354,19 @@ fun ListaClientes(clienteViewModel: ClienteViewModel, navController: NavControll
                 }
             }
         }
+    }
 
+    Column(
+        modifier = Modifier.fillMaxSize().padding(bottom = 60.dp, end = 20.dp),
+        verticalArrangement = Arrangement.Bottom,
+        horizontalAlignment = Alignment.End
+    ){
+        LargeFloatingActionButton(
+            onClick = { navController.navigate("cadastrarCliente" )},
+            Modifier.size(70.dp)
+        ) {
+            Icon(Icons.Filled.Add, "Floating action button.")
+        }
     }
 }
 

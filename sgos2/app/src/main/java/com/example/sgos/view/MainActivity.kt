@@ -1,8 +1,10 @@
 package com.example.sgos.view
 
+import android.content.Context
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -97,7 +99,7 @@ fun AppNavigation(
 
     NavHost(navController = navController, startDestination = "telaInicial") {
         composable("telaInicial") { TelaInicial(navController) }
-        composable("menuCadastros") { MenuCadastros(navController) }
+        composable("menuCadastros") { MenuCadastros(navController, acabamentoViewModel, equipamentoViewModel, context) }
         composable("listaAcabamento") { ListaAcabamento(acabamentoViewModel, navController) }
         composable("listaClientes") { ListaClientes(clienteViewModel, navController) }
         composable("cadastrarCliente") {
@@ -111,8 +113,8 @@ fun AppNavigation(
         composable("listaEquipamentos") { ListaEquipamentos(equipamentoViewModel, navController) }
         composable("listaFuncionarios") { ListaFuncionarios(funcionarioViewModel, navController) }
         composable("listaProdutos") { ListaProdutos(produtoViewModel, acabamentoViewModel, equipamentoViewModel, navController) }
-        composable("listaOrdemServico") { ListaOrdemServico(false, ordemServicoViewModel, clienteViewModel, produtoViewModel, funcionarioViewModel, navController) }
-        composable("listaSolicitacoesBaixa") { ListaOrdemServico(true, ordemServicoViewModel, clienteViewModel, produtoViewModel, funcionarioViewModel, navController) }
+        composable("listaOrdemServico") { ListaOrdemServico(false, ordemServicoViewModel, clienteViewModel, produtoViewModel, funcionarioViewModel, navController, context) }
+        composable("listaSolicitacoesBaixa") { ListaOrdemServico(true, ordemServicoViewModel, clienteViewModel, produtoViewModel, funcionarioViewModel, navController, context) }
         composable("editarOrdemSerivo/{osJson}"){ backStackEntry ->
             val osJson = backStackEntry.arguments?.getString("osJson")
             val os = Gson().fromJson(osJson, OrdemServico::class.java)
@@ -193,7 +195,7 @@ fun TelaInicial(navController: NavController) {
 
 
 @Composable
-fun MenuCadastros(navController: NavController) {
+fun MenuCadastros(navController: NavController, acabamentoViewModel: AcabamentoViewModel, equipamentoViewModel: EquipamentoViewModel, context: Context) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -288,7 +290,13 @@ fun MenuCadastros(navController: NavController) {
 
         // Botão Cadastro de Produtos
         Button(
-            onClick = { navController.navigate("listaProdutos") },
+            onClick = {
+                    if(acabamentoViewModel.listaAcabamentos.value.isEmpty() || equipamentoViewModel.listaEquipamentos.value.isEmpty()){
+                        Toast.makeText(context, "Primeiro cadastre pelo menos um equipamento e um acabamento antes de acessar essa página", Toast.LENGTH_LONG).show()
+                    }else{
+                        navController.navigate("listaProdutos")
+                    }
+                },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),  // Espaçamento entre os botões

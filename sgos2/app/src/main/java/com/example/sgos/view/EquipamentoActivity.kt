@@ -15,6 +15,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -23,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -59,7 +61,7 @@ fun ListaEquipamentos(equipamentoViewModel: EquipamentoViewModel, navController:
         }, onDismiss = { mostrarCaixaDialogo = false })
     }
 
-    Column(Modifier.fillMaxSize().padding(20.dp)) {
+    Column(Modifier.fillMaxSize().padding(25.dp, 50.dp, 25.dp, 30.dp)) {
 
         Text(
             text = "Cadastrar/Atualizar Equipamento",
@@ -147,14 +149,32 @@ fun ListaEquipamentos(equipamentoViewModel: EquipamentoViewModel, navController:
 
         Spacer(modifier = Modifier.height(15.dp))
 
-        Text(text = "Lista de Equipamentos",
-            modifier = Modifier.fillMaxWidth(),
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF1A1A1A))
-
         // Lista de equipamentos com separação visual
         LazyColumn {
+            item {
+                Text(text = "Lista de Equipamentos",
+                    modifier = Modifier.fillMaxWidth(),
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1A1A1A))
+
+                Spacer(modifier = Modifier.height(15.dp))
+
+                if(listaEquipamentos.isEmpty()){
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(75.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+
+                        ) {
+                        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally)
+                        {
+                            Text(text = "Não há nenhum equipamento cadastrado", fontSize = 20.sp)
+                        }
+                    }
+                }
+            }
             items(listaEquipamentos) { equipamento ->
                 Card(
                     modifier = Modifier
