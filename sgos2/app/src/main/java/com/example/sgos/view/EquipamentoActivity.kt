@@ -34,12 +34,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.example.sgos.model.entity.Equipamento
 import com.example.sgos.viewmodel.EquipamentoViewModel
+import com.example.sgos.viewmodel.OrdemServicoViewModel
+import com.example.sgos.viewmodel.ProdutoViewModel
+import kotlinx.coroutines.delay
 
 @Composable
-fun ListaEquipamentos(equipamentoViewModel: EquipamentoViewModel, navController: NavController) {
+fun ListaEquipamentos(equipamentoViewModel: EquipamentoViewModel, produtoViewModel: ProdutoViewModel, ordemServicoViewModel: OrdemServicoViewModel) {
     var nome by remember { mutableStateOf("") }
     var descricao by remember { mutableStateOf("") }
     var equipamentoTemp by remember { mutableStateOf<Equipamento?>(null) }
@@ -56,7 +58,8 @@ fun ListaEquipamentos(equipamentoViewModel: EquipamentoViewModel, navController:
     // Caixa de diálogo para confirmação de exclusão
     if (mostrarCaixaDialogo) {
         ExcluirEquipamento(onConfirm = {
-            equipamentoTemp?.let { equipamentoViewModel.excluirEquipamento(it) }
+            equipamentoTemp?.let { equipamentoViewModel.excluirEquipamento(it, ordemServicoViewModel, produtoViewModel) }
+
             mostrarCaixaDialogo = false
         }, onDismiss = { mostrarCaixaDialogo = false })
     }

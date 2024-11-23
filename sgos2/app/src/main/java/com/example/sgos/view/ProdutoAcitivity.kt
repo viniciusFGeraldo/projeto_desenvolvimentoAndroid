@@ -19,7 +19,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -37,12 +36,12 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.example.sgos.model.entity.Acabamento
 import com.example.sgos.model.entity.Equipamento
 import com.example.sgos.model.entity.Produto
 import com.example.sgos.viewmodel.AcabamentoViewModel
 import com.example.sgos.viewmodel.EquipamentoViewModel
+import com.example.sgos.viewmodel.OrdemServicoViewModel
 import com.example.sgos.viewmodel.ProdutoViewModel
 
 @Composable
@@ -50,7 +49,7 @@ fun ListaProdutos(
     produtoViewModel: ProdutoViewModel,
     acabamentoViewModel: AcabamentoViewModel,
     equipamentoViewModel: EquipamentoViewModel,
-    navController: NavController
+    ordemServicoViewModel:OrdemServicoViewModel
 ) {
     var nome by remember { mutableStateOf("") }
     var descricao by remember { mutableStateOf("") }
@@ -77,7 +76,8 @@ fun ListaProdutos(
     // Caixa de diálogo para confirmação de exclusão
     if (mostrarCaixaDialogo) {
         ExcluirProduto(onConfirm = {
-            produtoExcluir?.let { produtoViewModel.excluirProduto(it) }
+            produtoExcluir?.let { produtoViewModel.excluirProduto(it, ordemServicoViewModel) }
+
             mostrarCaixaDialogo = false
         }, onDismiss = { mostrarCaixaDialogo = false })
     }

@@ -11,6 +11,8 @@ abstract class Validacao {
         fun haCamposEmBranco(nome: String, cpf: String, rg: String, cep: String, endereco: String, bairro: String, cidade: String, telefone: String) : Boolean{
             return nome.isBlank() || cpf.isBlank() || rg.isBlank() || cep.isBlank() || endereco.isBlank() || bairro.isBlank() || cidade.isBlank() || telefone.isBlank()
         }
+
+
     }
 
 }

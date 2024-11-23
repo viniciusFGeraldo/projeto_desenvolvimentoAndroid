@@ -18,7 +18,7 @@ class OrdemServicoViewModel(private val ordemServicoDao: OrdemServicoDao) : View
         carregarOrdemServico()
     }
 
-    private fun carregarOrdemServico() {
+    fun carregarOrdemServico() {
         viewModelScope.launch {
             listaOrdemServico.value = ordemServicoDao.buscarTodos()
         }
@@ -63,28 +63,24 @@ class OrdemServicoViewModel(private val ordemServicoDao: OrdemServicoDao) : View
         }
     }
 
-    fun atualizarOrdemServico(
-        id: Int, largura: Float, altura:Float, valorM2: Float, quantidade: Int, valorUnitario: Float,
-        valorTotal: Float, valorDesconto: Float, valorAPagar: Float, observacoes: String,
-        status: Status, clienteId: Int, funcionarioId: Int, produtoId: Int
-    ): String {
+    fun atualizarOrdemServico(id: Int, ordemServicoNova: OrdemServico): String {
 
         val ordemServico = listaOrdemServico.value.find { it.id == id } ?: return "Erro ao atualizar ordem de serviço"
 
         val ordemServicoAtualizada = ordemServico.copy(
-            largura = largura,
-            altura = altura,
-            valorM2 = valorM2,
-            quantidade = quantidade,
-            valorUnitario = valorUnitario,
-            valorTotal = valorTotal,
-            valorDesconto = valorDesconto,
-            valorAPagar = valorAPagar,
-            observacoes = observacoes,
-            status = status,
-            clienteId = clienteId,
-            funcionarioId = funcionarioId,
-            produtoId = produtoId
+            largura = ordemServicoNova.largura,
+            altura = ordemServicoNova.altura,
+            valorM2 = ordemServicoNova.valorM2,
+            quantidade = ordemServicoNova.quantidade,
+            valorUnitario = ordemServicoNova.valorUnitario,
+            valorTotal = ordemServicoNova.valorTotal,
+            valorDesconto = ordemServicoNova.valorDesconto,
+            valorAPagar = ordemServicoNova.valorAPagar,
+            observacoes = ordemServicoNova.observacoes,
+            status = ordemServicoNova.status,
+            clienteId = ordemServicoNova.clienteId,
+            funcionarioId = ordemServicoNova.funcionarioId,
+            produtoId = ordemServicoNova.produtoId
         )
 
         viewModelScope.launch {
@@ -93,6 +89,26 @@ class OrdemServicoViewModel(private val ordemServicoDao: OrdemServicoDao) : View
         }
 
         return "Ordem de serviço atualizada com sucesso!"
+    }
+
+    fun solicitarBaixa(id: Int, desconto: Float): String {
+
+        val ordemServico = listaOrdemServico.value.find { it.id == id } ?: return "Erro ao solicitar baixa de ordem de serviço"
+
+
+        val ordemServicoAtualizada = ordemServico.copy(
+            valorDesconto = desconto,
+            valorAPagar = ordemServico.valorTotal - desconto
+        )
+
+        viewModelScope.launch {
+            ordemServicoDao.atualizar(ordemServicoAtualizada)
+            carregarOrdemServico()
+        }
+
+        atualizarStatus(ordemServicoAtualizada);
+
+        return "Solicitação de Baixa efetuada com sucesso!"
     }
 
     fun atualizarStatus(ordemServico: OrdemServico) {

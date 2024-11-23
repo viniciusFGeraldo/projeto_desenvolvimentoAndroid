@@ -34,12 +34,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.example.sgos.model.entity.Funcionario
 import com.example.sgos.viewmodel.FuncionarioViewModel
+import com.example.sgos.viewmodel.OrdemServicoViewModel
 
 @Composable
-fun ListaFuncionarios(funcionarioViewModel: FuncionarioViewModel, navController: NavController) {
+fun ListaFuncionarios(funcionarioViewModel: FuncionarioViewModel, ordemServicoViewModel: OrdemServicoViewModel) {
     var nome by remember { mutableStateOf("") }
     var telefone by remember { mutableStateOf("") }
     var funcionarioTemp by remember { mutableStateOf<Funcionario?>(null) }
@@ -56,7 +56,8 @@ fun ListaFuncionarios(funcionarioViewModel: FuncionarioViewModel, navController:
     // Caixa de diálogo para confirmação de exclusão
     if (mostrarCaixaDialogo) {
         ExcluirFuncionario(onConfirm = {
-            funcionarioTemp?.let { funcionarioViewModel.excluirFuncionario(it) }
+            funcionarioTemp?.let { funcionarioViewModel.excluirFuncionario(it, ordemServicoViewModel) }
+
             mostrarCaixaDialogo = false
         }, onDismiss = { mostrarCaixaDialogo = false })
     }

@@ -35,7 +35,6 @@ abstract class AppDatabase: RoomDatabase() {
         private var INSTANCE : AppDatabase? = null
 
         fun getDatabase(context: Context): AppDatabase {
-
             return INSTANCE ?: synchronized(this) {
                 val tempInstance = Room.databaseBuilder(
                     context.applicationContext,

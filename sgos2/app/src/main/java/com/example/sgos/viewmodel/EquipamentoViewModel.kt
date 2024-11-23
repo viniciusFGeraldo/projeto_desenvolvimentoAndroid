@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.sgos.model.Validacao
 import com.example.sgos.model.database.dao.EquipamentoDao
 import com.example.sgos.model.entity.Equipamento
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Date
 
@@ -15,12 +16,24 @@ class EquipamentoViewModel(private val equipamentoDao: EquipamentoDao): ViewMode
         private set
 
     init {
-        carregarEquipamentos()
+        initCarregarEquipamentos()
     }
 
     private fun carregarEquipamentos() {
         viewModelScope.launch {
             listaEquipamentos.value = equipamentoDao.buscarTodos()
+        }
+    }
+
+    private fun initCarregarEquipamentos() {
+        viewModelScope.launch {
+            listaEquipamentos.value = equipamentoDao.buscarTodos()
+            if(listaEquipamentos.value.isEmpty()){
+                salvarEquipamento("My Jet", "máquina de impressão digital para grandes formatos com tamanho de boca 3.20m e com tinta a base de solvente")
+                salvarEquipamento("Roland", "máquina para pequenos formatos com tamanho de boca de 1.60 e com tinta a base de solvente")
+                salvarEquipamento("Plotter", "máquina para corte de vinil de até 1.27m")
+                salvarEquipamento("Gráfica", "parte tercerizada como cartão de visita e flayer")
+            }
         }
     }
 
@@ -44,11 +57,14 @@ class EquipamentoViewModel(private val equipamentoDao: EquipamentoDao): ViewMode
 
     }
 
-    fun excluirEquipamento(equipamento: Equipamento) {
+    fun excluirEquipamento(equipamento: Equipamento, ordemServicoViewModel:OrdemServicoViewModel, produtoViewModel: ProdutoViewModel) {
 
         viewModelScope.launch {
             equipamentoDao.deletar(equipamento)
+            delay(100)
             carregarEquipamentos()
+            ordemServicoViewModel.carregarOrdemServico()
+            produtoViewModel.carregarProdutos()
         }
 
     }

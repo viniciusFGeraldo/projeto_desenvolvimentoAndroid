@@ -37,9 +37,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.sgos.model.entity.Acabamento
 import com.example.sgos.viewmodel.AcabamentoViewModel
+import com.example.sgos.viewmodel.OrdemServicoViewModel
+import com.example.sgos.viewmodel.ProdutoViewModel
 
 @Composable
-fun ListaAcabamento(acabamentoViewModel: AcabamentoViewModel, navController: NavController) {
+fun ListaAcabamento(navController: NavController, acabamentoViewModel: AcabamentoViewModel, produtoViewModel: ProdutoViewModel, ordemServicoViewModel: OrdemServicoViewModel) {
     var nome by remember { mutableStateOf("") }
     var descricao by remember { mutableStateOf("") }
     var acabamentoTemp by remember { mutableStateOf<Acabamento?>(null) }
@@ -56,7 +58,8 @@ fun ListaAcabamento(acabamentoViewModel: AcabamentoViewModel, navController: Nav
     // Caixa de diálogo para confirmação de exclusão
     if (mostrarCaixaDialogo) {
         ExcluirAcabamento(onConfirm = {
-            acabamentoTemp?.let { acabamentoViewModel.excluirAcabamento(it) }
+            acabamentoTemp?.let { acabamentoViewModel.excluirAcabamento(it, ordemServicoViewModel, produtoViewModel) }
+
             mostrarCaixaDialogo = false
         }, onDismiss = { mostrarCaixaDialogo = false })
     }

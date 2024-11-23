@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.sgos.model.Validacao
 import com.example.sgos.model.database.dao.FuncionarioDao
 import com.example.sgos.model.entity.Funcionario
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Date
 
@@ -15,12 +16,26 @@ class FuncionarioViewModel(private var funcionarioDao: FuncionarioDao): ViewMode
         private set
 
     init {
-        carregarFuncionarios()
+        initCarregarFuncionarios()
     }
 
     private fun carregarFuncionarios() {
         viewModelScope.launch {
             listaFuncionarios.value = funcionarioDao.buscarTodos()
+        }
+    }
+
+    private fun initCarregarFuncionarios() {
+        viewModelScope.launch {
+            listaFuncionarios.value = funcionarioDao.buscarTodos()
+
+            if(listaFuncionarios.value.isEmpty()){
+                salvarFuncionario("Danilo Juan Cláudio das Neves", "(79) 98932-4794")
+                salvarFuncionario("Juliana Julia Alícia da Rocha", "(27) 98783-4120")
+                salvarFuncionario("Cristiane Regina da Luz", "(34) 99490-4977")
+                salvarFuncionario("Jéssica Brenda Bernardes", "(11) 99756-8815")
+                salvarFuncionario("Maria Benedita Mariane Almada", "(48) 98901-4168")
+            }
         }
     }
 
@@ -44,11 +59,14 @@ class FuncionarioViewModel(private var funcionarioDao: FuncionarioDao): ViewMode
 
     }
 
-    fun excluirFuncionario(funcionario: Funcionario) {
+    fun excluirFuncionario(funcionario: Funcionario, ordemServicoViewModel:OrdemServicoViewModel) {
 
         viewModelScope.launch {
             funcionarioDao.deletar(funcionario)
+            delay(100)
+
             carregarFuncionarios()
+            ordemServicoViewModel.carregarOrdemServico()
         }
 
     }

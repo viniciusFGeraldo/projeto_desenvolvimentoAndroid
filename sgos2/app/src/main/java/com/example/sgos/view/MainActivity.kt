@@ -15,8 +15,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +35,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sgos.model.database.AppDatabase
 import com.example.sgos.model.entity.Cliente
 import com.example.sgos.model.entity.OrdemServico
+import com.example.sgos.model.entity.Status
 import com.example.sgos.viewmodel.AcabamentoViewModel
 import com.example.sgos.viewmodel.AcabamentoViewModelFactory
 import com.example.sgos.viewmodel.ClienteViewModel
@@ -66,7 +71,7 @@ class MainActivity : ComponentActivity() {
         FuncionarioViewModelFactory(dao)
     }
 
-    private val produtoViewModel : ProdutoViewModel by viewModels {
+    private val produtoViewModel : ProdutoViewModel by viewModels{
         val dao = AppDatabase.getDatabase(applicationContext).getProdutoDao()
         ProdutoViewModelFactory(dao)
     }
@@ -100,8 +105,8 @@ fun AppNavigation(
     NavHost(navController = navController, startDestination = "telaInicial") {
         composable("telaInicial") { TelaInicial(navController) }
         composable("menuCadastros") { MenuCadastros(navController, acabamentoViewModel, equipamentoViewModel, context) }
-        composable("listaAcabamento") { ListaAcabamento(acabamentoViewModel, navController) }
-        composable("listaClientes") { ListaClientes(clienteViewModel, navController) }
+        composable("listaAcabamento") { ListaAcabamento(navController, acabamentoViewModel, produtoViewModel, ordemServicoViewModel) }
+        composable("listaClientes") { ListaClientes(clienteViewModel, navController, ordemServicoViewModel) }
         composable("cadastrarCliente") {
             FormClientes(false, clienteViewModel, navController, null)
         }
@@ -110,9 +115,9 @@ fun AppNavigation(
             val cliente = Gson().fromJson(clienteJson, Cliente::class.java)
             FormClientes(true, clienteViewModel, navController, cliente)
         }
-        composable("listaEquipamentos") { ListaEquipamentos(equipamentoViewModel, navController) }
-        composable("listaFuncionarios") { ListaFuncionarios(funcionarioViewModel, navController) }
-        composable("listaProdutos") { ListaProdutos(produtoViewModel, acabamentoViewModel, equipamentoViewModel, navController) }
+        composable("listaEquipamentos") { ListaEquipamentos(equipamentoViewModel, produtoViewModel, ordemServicoViewModel) }
+        composable("listaFuncionarios") { ListaFuncionarios(funcionarioViewModel, ordemServicoViewModel) }
+        composable("listaProdutos") { ListaProdutos(produtoViewModel, acabamentoViewModel, equipamentoViewModel, ordemServicoViewModel) }
         composable("listaOrdemServico") { ListaOrdemServico(false, ordemServicoViewModel, clienteViewModel, produtoViewModel, funcionarioViewModel, navController, context) }
         composable("listaSolicitacoesBaixa") { ListaOrdemServico(true, ordemServicoViewModel, clienteViewModel, produtoViewModel, funcionarioViewModel, navController, context) }
         composable("editarOrdemSerivo/{osJson}"){ backStackEntry ->
@@ -121,16 +126,19 @@ fun AppNavigation(
             FormOrdemServico(true, os, ordemServicoViewModel, clienteViewModel, produtoViewModel, funcionarioViewModel, navController)
         }
         composable("cadastroOrdemServico") { FormOrdemServico(false, null, ordemServicoViewModel, clienteViewModel, produtoViewModel, funcionarioViewModel, navController) }
-        composable("solicitacaoDeBaixa/{osJson}") {backStackEntry ->
-            val osJson = backStackEntry.arguments?.getString("osJson")
-            val os = Gson().fromJson(osJson, OrdemServico::class.java)
-            MostrarInformacaoOS(os, navController, ordemServicoViewModel,produtoViewModel,  clienteViewModel, funcionarioViewModel, context)
-        }
         composable("mostrarInformacaoOS/{osId}") {backStackEntry ->
             val osId = backStackEntry.arguments?.getString("osId")
             val os = ordemServicoViewModel.listaOrdemServico.value.find { it.id == osId?.toInt() }
             if(os != null){
                 MostrarInformacaoOS(os, navController, ordemServicoViewModel, produtoViewModel,  clienteViewModel, funcionarioViewModel, context)
+            }
+        }
+        composable("SolicitarBaixa/{osId}") {backStackEntry ->
+            val osId = backStackEntry.arguments?.getString("osId")
+            val os = ordemServicoViewModel.listaOrdemServico.value.find { it.id == osId?.toInt() }
+
+            if(os != null){
+                SolicitarBaixa(os, navController, context, ordemServicoViewModel, clienteViewModel, produtoViewModel, funcionarioViewModel)
             }
         }
     }
@@ -312,5 +320,20 @@ fun MenuCadastros(navController: NavController, acabamentoViewModel: AcabamentoV
                 style = MaterialTheme.typography.h6.copy(color = Color.White)
             )
         }
+    }
+
+}
+
+@Composable
+fun BackButton(onClick:()->Unit) {
+    IconButton(
+        onClick = { onClick() },
+        modifier = Modifier.padding(start = 16.dp)  // Adicionando padding se necessário
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+            contentDescription = "Voltar",
+            tint = Color.Black // Ajuste a cor do ícone conforme necessário
+        )
     }
 }

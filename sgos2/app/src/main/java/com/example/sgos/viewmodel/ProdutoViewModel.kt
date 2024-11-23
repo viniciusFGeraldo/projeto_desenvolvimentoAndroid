@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.sgos.model.Validacao
 import com.example.sgos.model.database.dao.ProdutoDao
 import com.example.sgos.model.entity.Produto
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Date
 
@@ -15,12 +16,26 @@ class ProdutoViewModel(private val produtoDao: ProdutoDao) : ViewModel() {
         private set
 
     init {
-        carregarProdutos()
+        initCarregarProdutos()
     }
 
-    private fun carregarProdutos() {
+    fun carregarProdutos(){
         viewModelScope.launch {
             listaProdutos.value = produtoDao.buscarTodos()
+        }
+    }
+
+    private fun initCarregarProdutos() {
+        viewModelScope.launch {
+            listaProdutos.value = produtoDao.buscarTodos()
+
+            if(listaProdutos.value.isEmpty()){
+                salvarProduto("cartão de visita", "serviço tercerizado", 2, 3)
+                salvarProduto("lona front", "lona 440g branco front-light com fundo black", 1, 1)
+                salvarProduto("lona backlight", "lona 440g branco back-light com fundo branco", 2, 2)
+                salvarProduto("adesivo branco ", "adesivo 10mm para impressão digital", 3, 3)
+                salvarProduto("adesivo recorte", "recorte de adesivo colorido para aplicação", 4, 4)
+            }
         }
     }
 
@@ -52,10 +67,12 @@ class ProdutoViewModel(private val produtoDao: ProdutoDao) : ViewModel() {
         return "Produto salvo com sucesso!"
     }
 
-    fun excluirProduto(produto: Produto) {
+    fun excluirProduto(produto: Produto, ordemServicoViewModel:OrdemServicoViewModel) {
         viewModelScope.launch {
             produtoDao.deletar(produto)
+            delay(100)
             carregarProdutos()
+            ordemServicoViewModel.carregarOrdemServico()
         }
     }
 

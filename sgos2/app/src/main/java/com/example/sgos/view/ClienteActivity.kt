@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -23,7 +22,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.Text
@@ -45,8 +43,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.sgos.model.entity.Cliente
-import com.example.sgos.model.entity.Status
 import com.example.sgos.viewmodel.ClienteViewModel
+import com.example.sgos.viewmodel.OrdemServicoViewModel
 import com.google.gson.Gson
 
 @Composable
@@ -252,21 +250,21 @@ fun FormClientes(modoEditar: Boolean, clienteViewModel: ClienteViewModel, navCon
         }
 
         Spacer(modifier = Modifier.height(15.dp))
-
     }
 }
 
-
 @Composable
-fun ListaClientes(clienteViewModel: ClienteViewModel, navController: NavController){
+fun ListaClientes(clienteViewModel: ClienteViewModel, navController: NavController, ordemServicoViewModel: OrdemServicoViewModel){
     val listaClientes by clienteViewModel.listaClientes
 
     var mostrarCaixaDialogo by remember { mutableStateOf(false) }
     var clienteTemp by remember { mutableStateOf<Cliente?>(null) }
 
+    var busca by remember { mutableStateOf("") }
     if (mostrarCaixaDialogo) {
         ExcluirCliente(onConfirm = {
-            clienteTemp?.let { clienteViewModel.excluirCliente(it) }
+            clienteTemp?.let { clienteViewModel.excluirCliente(it, ordemServicoViewModel) }
+
             mostrarCaixaDialogo = false
         }, onDismiss = { mostrarCaixaDialogo = false })
     }
@@ -298,56 +296,77 @@ fun ListaClientes(clienteViewModel: ClienteViewModel, navController: NavControll
                         }
                     }
                 }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                TextField(
+                    value = busca,
+                    onValueChange = { busca = it },
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    label = { Text(text = "Busca") },
+                    shape = MaterialTheme.shapes.medium,
+                    singleLine = true,
+                    textStyle = TextStyle(
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = Color.Black
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
             }
             items(listaClientes) { cliente ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 5.dp)
-                        .shadow(4.dp, shape = MaterialTheme.shapes.medium),
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Column(
+                if(busca.isBlank() || (busca.isNotBlank() && (cliente.nome.contains(busca, ignoreCase = true)))){
+                    Card(
                         modifier = Modifier
-                            .padding(16.dp)
+                            .fillMaxWidth()
+                            .padding(vertical = 5.dp)
+                            .shadow(4.dp, shape = MaterialTheme.shapes.medium),
+                        shape = MaterialTheme.shapes.medium
                     ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(16.dp)
+                        ) {
 
-                        Text(
-                            text = "Nome: ${cliente.nome}",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF333333)
-                        )
+                            Text(
+                                text = "Nome: ${cliente.nome}",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF333333)
+                            )
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(8.dp))
 
-                        Text(
-                            text = "CPF: ${cliente.cpf}",
-                            fontSize = 14.sp,
-                            color = Color(0xFF757575)
-                        )
+                            Text(
+                                text = "CPF: ${cliente.cpf}",
+                                fontSize = 14.sp,
+                                color = Color(0xFF757575)
+                            )
 
-                        Spacer(modifier = Modifier.height(10.dp))
+                            Spacer(modifier = Modifier.height(10.dp))
 
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Button(
-                                onClick = {
-                                    clienteTemp = cliente
-                                    mostrarCaixaDialogo = true
-                                },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-                            ) {
-                                Text(text = "Excluir", color = Color.White)
-                            }
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Button(
+                                    onClick = {
+                                        clienteTemp = cliente
+                                        mostrarCaixaDialogo = true
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                                ) {
+                                    Text(text = "Excluir", color = Color.White)
+                                }
 
-                            Button(
-                                onClick = {
-                                    val clienteJson = Gson().toJson(cliente)
-                                    navController.navigate("editarCliente/${clienteJson}")
-                                },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
-                            ) {
-                                Text(text = "Atualizar", color = Color.White)
+                                Button(
+                                    onClick = {
+                                        val clienteJson = Gson().toJson(cliente)
+                                        navController.navigate("editarCliente/${clienteJson}")
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
+                                ) {
+                                    Text(text = "Atualizar", color = Color.White)
+                                }
                             }
                         }
                     }

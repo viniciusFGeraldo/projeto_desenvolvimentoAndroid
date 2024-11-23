@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -87,49 +86,52 @@ fun ListaOrdemServico(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Button(onClick = { navController.popBackStack() }, modifier = Modifier.weight(1.2f)) {
-                Text("Voltar")
-            }
-
-            if (!modoSolicitacaoBaixa) {
-                Spacer(modifier = Modifier.weight(0.3f))
-
-                Button(onClick = { navController.navigate("listaSolicitacoesBaixa") }, modifier = Modifier.weight(2f)) {
-                    Text("Solicitações de Baixas")
-                }
-
-                Spacer(modifier = Modifier.weight(0.3f))
-
-                Button(
-                    onClick = {
-                        if(listaClientes.isEmpty() || listaFuncionarios.isEmpty() || listaProdutos.isEmpty()){
-                            Toast.makeText(context, "Primeiro faça cadastro de pelo menos um: cliente, funcionário e produto para acessar essa página", Toast.LENGTH_LONG).show()
-                        }else {
-                            navController.navigate("cadastroOrdemServico")
-                        }
-                    },
-                    modifier = Modifier.weight(1.5f)) {
-                    Text("Cadastrar")
-                }
-            }
-        }
 
         Spacer(modifier = Modifier.height(30.dp))
 
         LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             item{
-                Text(text = "${if(modoSolicitacaoBaixa) "Lista de Solicitações de Baixa" else "Lista de Ordem de Serviço"} ",
-                    modifier = Modifier.fillMaxWidth(),
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1A1A1A))
+                Row (
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    BackButton(onClick = {navController.popBackStack()})
+
+                    Text(text = "${if(modoSolicitacaoBaixa) "Lista de Solicitações de Baixa" else "Lista de Ordem de Serviço"} ",
+                        modifier = Modifier.fillMaxWidth(),
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1A1A1A))
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    if (!modoSolicitacaoBaixa) {
+                        Spacer(modifier = Modifier.weight(0.3f))
+
+                        Button(onClick = { navController.navigate("listaSolicitacoesBaixa") }, modifier = Modifier.weight(2f)) {
+                            Text("Solicitações de Baixas")
+                        }
+
+                        Spacer(modifier = Modifier.weight(0.3f))
+
+                        Button(
+                            onClick = {
+                                if(listaClientes.isEmpty() || listaFuncionarios.isEmpty() || listaProdutos.isEmpty()){
+                                    Toast.makeText(context, "Primeiro faça cadastro de pelo menos um: cliente, funcionário e produto para acessar essa página", Toast.LENGTH_LONG).show()
+                                }else {
+                                    navController.navigate("cadastroOrdemServico")
+                                }
+                            },
+                            modifier = Modifier.weight(1.5f)) {
+                            Text("Cadastrar")
+                        }
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                if((!modoSolicitacaoBaixa && listaOrdemServico.filter{it.status != Status.SOLICITADO_BAIXA}.isEmpty()) || (modoSolicitacaoBaixa && listaOrdemServico.filter { it.status == Status.SOLICITADO_BAIXA }.isEmpty())){
+                if((!modoSolicitacaoBaixa && listaOrdemServico.none { it.status != Status.SOLICITADO_BAIXA }) || (modoSolicitacaoBaixa && listaOrdemServico.none { it.status == Status.SOLICITADO_BAIXA })){
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -144,6 +146,7 @@ fun ListaOrdemServico(
                     }
                 }
             }
+
             items(listaOrdemServico) { ordemServico ->
                 if ((!modoSolicitacaoBaixa && ordemServico.status != Status.SOLICITADO_BAIXA) ||
                     (modoSolicitacaoBaixa && ordemServico.status == Status.SOLICITADO_BAIXA)
@@ -241,7 +244,6 @@ fun FormOrdemServico(
         modifier = Modifier
             .fillMaxSize()
             .padding(25.dp, 50.dp, 25.dp, 30.dp)
-            .size(100.dp)
             .verticalScroll(rememberScrollState())
     ) {
         Text(
@@ -250,29 +252,77 @@ fun FormOrdemServico(
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // Cliente
-        DropdownMenuField(
-            label = "Cliente",
-            selectedText = clienteSelecionado?.nome.orEmpty(),
-            options = listaClientes,
-            onOptionSelected = { clienteSelecionado = it }
-        )
+        var expandedCliente by remember { mutableStateOf(false) }
+
+        OutlinedButton(onClick = { expandedCliente = true }, modifier = Modifier.fillMaxWidth()) {
+            Text(clienteSelecionado?.nome ?: "Selecione um Cliente")
+        }
+
+        Box(modifier = Modifier.fillMaxWidth()) {
+            DropdownMenu(
+                modifier = Modifier.fillMaxWidth(),
+                expanded = expandedCliente,
+                onDismissRequest = { expandedCliente = false }
+            ) {
+                listaClientes.forEach { cliente ->
+                    DropdownMenuItem(
+                        text = { Text(text = cliente.nome) },
+                        onClick = {
+                            clienteSelecionado = cliente
+                            expandedCliente = false
+                        }
+                    )
+                }
+            }
+        }
 
         // Funcionário
-        DropdownMenuField(
-            label = "Funcionário",
-            selectedText = funcionarioSelecionado?.nome.orEmpty(),
-            options = listaFuncionarios,
-            onOptionSelected = { funcionarioSelecionado = it }
-        )
+        var expandedFuncionario by remember { mutableStateOf(false) }
+
+        Box(modifier = Modifier.fillMaxWidth()) {
+            OutlinedButton(onClick = { expandedFuncionario = true }, modifier = Modifier.fillMaxWidth()) {
+                Text(funcionarioSelecionado?.nome ?: "Selecione um Funcionario")
+            }
+            DropdownMenu(
+                modifier = Modifier.fillMaxWidth(),
+                expanded = expandedFuncionario,
+                onDismissRequest = { expandedFuncionario = false }
+            ) {
+                listaFuncionarios.forEach { funcionario ->
+                    DropdownMenuItem(
+                        text = { Text(text = funcionario.nome) },
+                        onClick = {
+                            funcionarioSelecionado = funcionario
+                            expandedFuncionario = false
+                        }
+                    )
+                }
+            }
+        }
 
         // Produto
-        DropdownMenuField(
-            label = "Produto",
-            selectedText = produtoSelecionado?.nome.orEmpty(),
-            options = listaProdutos,
-            onOptionSelected = { produtoSelecionado = it }
-        )
+        var expadedProduto by remember { mutableStateOf(false) }
+
+        Box(modifier = Modifier.fillMaxWidth()) {
+            OutlinedButton(onClick = { expadedProduto = true }, modifier = Modifier.fillMaxWidth()) {
+                Text(produtoSelecionado?.nome ?: "Selecione um Produto")
+            }
+            DropdownMenu(
+                modifier = Modifier.fillMaxWidth(),
+                expanded = expadedProduto,
+                onDismissRequest = { expadedProduto = false }
+            ) {
+                listaProdutos.forEach { produto ->
+                    DropdownMenuItem(
+                        text = { Text(text = produto.nome) },
+                        onClick = {
+                            produtoSelecionado = produto
+                            expadedProduto = false
+                        }
+                    )
+                }
+            }
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -332,22 +382,7 @@ fun FormOrdemServico(
                     val retorno: String = if(modoEditar) {
                         ordemServico?.let {
                             // Agora passando valorTotal no lugar de valorUnitario * quantidade
-                            ordemServicoViewModel.atualizarOrdemServico(
-                                it.id,
-                                largura.toFloat(),
-                                altura.toFloat(),
-                                valorM2.toFloat(),
-                                quantidade.toInt(),
-                                valorUnitario.toFloat(),
-                                valorTotal.toFloat(), // Usando valorTotal calculado
-                                0f, // Definindo valorDesconto como 0 por padrão, pode ser alterado
-                                0f, // valorAPagar é igual ao valorTotal por enquanto
-                                observacoes,
-                                Status.EM_PRODUCAO, // Status fixo, pode ser alterado conforme a lógica
-                                clienteSelecionado!!.id, // Passando o clienteId
-                                funcionarioSelecionado!!.id, // Passando o funcionarioId
-                                produtoSelecionado!!.id // Passando o produtoId
-                            )
+                           ordemServicoViewModel.atualizarOrdemServico(it.id, ordemServico)
                         } ?: "Erro ao editar ordem de serviço"
                     }else {
                         ordemServicoViewModel.salvarOrdemServico(
@@ -381,45 +416,6 @@ fun FormOrdemServico(
         }
 
         Spacer(modifier = Modifier.height(30.dp))
-    }
-}
-
-// Composable para Dropdown
-@Composable
-fun <T> DropdownMenuField(
-    label: String,
-    selectedText: String,
-    options: List<T>,
-    onOptionSelected: (T) -> Unit
-) where T : Any {
-    var expanded by remember { mutableStateOf(false) }
-
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(bottom = 8.dp)) {
-        Text(text = label, style = MaterialTheme.typography.bodyMedium)
-        Box {
-            OutlinedButton(
-                onClick = { expanded = true },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(selectedText.ifEmpty { "Selecione" })
-            }
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                options.forEach { option ->
-                    DropdownMenuItem(
-                        text = { Text(option.toString()) },
-                        onClick = {
-                            onOptionSelected(option)
-                            expanded = false
-                        }
-                    )
-                }
-            }
-        }
     }
 }
 
@@ -531,39 +527,7 @@ fun MostrarInformacaoOS(
                     .align(Alignment.CenterHorizontally) // Centraliza o título
             )
 
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(4.dp),
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = "ID da ordem de serviço: ${ordemServico.id}", fontWeight = FontWeight.Bold)
-                    Text(text = "Cliente: $clienteNome", style = MaterialTheme.typography.bodyLarge)
-                    Text(text = "Produto: $produtoNome", style = MaterialTheme.typography.bodyLarge)
-                    Text(text = "Funcionário: $funcionarioNome", style = MaterialTheme.typography.bodyLarge)
-                    Text(text = "Status: ${ordemServico.status}", style = MaterialTheme.typography.bodyMedium)
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(text = "Largura: ${ordemServico.largura} m")
-                    Text(text = "Altura: ${ordemServico.altura} m")
-                    Text(text = "Área: ${ordemServico.largura * ordemServico.altura} m²")
-                    Text(text = "Valor por m²: R$ ${ordemServico.valorM2}")
-                    Text(text = "Quantidade: ${ordemServico.quantidade}")
-                    Text(text = "Valor Unitário: R$ ${ordemServico.valorUnitario}")
-                    Text(text = "Valor Total: R$ ${ordemServico.valorTotal}")
-
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = "Observações:", fontWeight = FontWeight.Bold)
-                    Text(text = ordemServico.observacoes, style = MaterialTheme.typography.bodyMedium)
-
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Data e Hora de Abertura: ${
-                            DateFormat.getDateInstance().format(ordemServico.dataHorarioAbertura)
-                        }"
-                    )
-                }
-            }
+            CardOrdemServico(ordemServico, clienteNome ?: "", produtoNome ?: "", funcionarioNome ?: "")
 
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -574,18 +538,19 @@ fun MostrarInformacaoOS(
                 .padding(bottom = 50.dp), // Espaço do rodapé
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Button(
-                onClick = {
-                    mostrarCaixaDialogo = true
-                },
-                colors = ButtonDefaults.buttonColors(Color.Red),
-                modifier = Modifier.weight(1f)
-            ) {
-                Text("Excluir", color = Color.White)
-            }
 
-            if(ordemServico.status != Status.BAIXADA){
-                Spacer(modifier = Modifier.weight(0.25f));
+            if(ordemServico.status != Status.BAIXADA && ordemServico.status != Status.SOLICITADO_BAIXA){
+                Button(
+                    onClick = {
+                        mostrarCaixaDialogo = true
+                    },
+                    colors = ButtonDefaults.buttonColors(Color.Red),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Excluir", color = Color.White)
+                }
+
+                Spacer(modifier = Modifier.weight(0.25f))
 
                 Button(
                     onClick = {
@@ -596,42 +561,150 @@ fun MostrarInformacaoOS(
                 ) {
                     Text("Editar", color = Color.White)
                 }
-                Spacer(modifier = Modifier.weight(0.25f));
+
+                Spacer(modifier = Modifier.weight(0.25f))
             }
 
-            when{
-                ordemServico.status == Status.PRONTO_PARA_ENTREGA -> {
+            when (ordemServico.status) {
+                Status.PRONTO_PARA_ENTREGA -> {
                     Button(onClick = {
-                            ordemServicoViewModel.atualizarStatus(ordemServico)
-                            navController.popBackStack();
-                        },
+                        navController.navigate("SolicitarBaixa/${ordemServico.id}")
+                    },
                         modifier = Modifier.weight(1.5f)
                     ) {
-                            Text("Solicitar Baixa")
+                        Text("Solicitar Baixa")
 
                     }
                 }
-
-                ordemServico.status == Status.SOLICITADO_BAIXA -> {
+                Status.SOLICITADO_BAIXA -> {
                     Button(modifier = Modifier.weight(1.5f),
                         onClick = {
-                        ordemServicoViewModel.atualizarStatus(ordemServico)
-                    }) {
-                        Text("Baixar")
+                            ordemServicoViewModel.atualizarStatus(ordemServico)
+                        }) {
+                        Text("Confirmar Baixa")
                     }
                 }
+                Status.BAIXADA -> {}
 
-                ordemServico.status == Status.BAIXADA -> {}
-
-                else ->{
+                else -> {
                     Button(modifier = Modifier.weight(1.5f),
                         onClick = {
-                        ordemServicoViewModel.atualizarStatus(ordemServico)
-                    }) {
+                            ordemServicoViewModel.atualizarStatus(ordemServico)
+                        }) {
                         Text("Atualizar Status")
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun CardOrdemServico(ordemServico: OrdemServico, clienteNome:String, produtoNome: String, funcionarioNome: String){
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(4.dp),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(text = "ID da ordem de serviço: ${ordemServico.id}", fontWeight = FontWeight.Bold)
+            Text(text = "Cliente: $clienteNome", style = MaterialTheme.typography.bodyLarge)
+            Text(text = "Produto: $produtoNome", style = MaterialTheme.typography.bodyLarge)
+            Text(text = "Funcionário: $funcionarioNome", style = MaterialTheme.typography.bodyLarge)
+            Text(text = "Status: ${ordemServico.status}", style = MaterialTheme.typography.bodyMedium)
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(text = "Largura: ${ordemServico.largura} m")
+            Text(text = "Altura: ${ordemServico.altura} m")
+            Text(text = "Área: ${ordemServico.largura * ordemServico.altura} m²")
+            Text(text = "Valor por m²: R$ ${ordemServico.valorM2}")
+            Text(text = "Quantidade: ${ordemServico.quantidade}")
+            Text(text = "Valor Unitário: R$ ${ordemServico.valorUnitario}")
+            Text(text = "Valor Total: R$ ${ordemServico.valorTotal}")
+            Text(text = "Desconto: R$ ${ordemServico.valorDesconto}")
+            Text(text = "Valor A pagar: R$ ${ordemServico.valorAPagar}")
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = "Observações:", fontWeight = FontWeight.Bold)
+            Text(text = ordemServico.observacoes, style = MaterialTheme.typography.bodyMedium)
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Data e Hora de Abertura: ${
+                    DateFormat.getDateInstance().format(ordemServico.dataHorarioAbertura)
+                }"
+            )
+        }
+    }
+}
+
+@Composable
+fun SolicitarBaixa(
+    ordemServico: OrdemServico,
+    navController: NavController,
+    context: Context,
+    ordemServicoViewModel: OrdemServicoViewModel,
+    clienteViewModel: ClienteViewModel,
+    produtoViewModel: ProdutoViewModel,
+    funcionarioViewModel: FuncionarioViewModel
+){
+    val clienteNome = clienteViewModel.listaClientes.value.find { it.id == ordemServico.clienteId }?.nome
+    val produtoNome = produtoViewModel.listaProdutos.value.find { it.id == ordemServico.produtoId }?.nome
+    val funcionarioNome = funcionarioViewModel.listaFuncionarios.value.find { it.id == ordemServico.funcionarioId }?.nome
+
+    var desconto by remember { mutableStateOf("") }
+    var valorAPagar by remember { mutableStateOf("") }
+
+    LaunchedEffect(desconto) {
+        valorAPagar = "${if(desconto.isNotBlank()) (ordemServico.valorTotal - desconto.toFloat()) else ordemServico.valorTotal}"
+    }
+
+    Column(
+        modifier = Modifier.fillMaxSize().padding(25.dp, 50.dp, 25.dp, 30.dp)
+    ) {
+
+        Text(
+            text = "Solicitar Baixa de Ordem de Serviço",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .padding(bottom = 16.dp)
+                .align(Alignment.CenterHorizontally) // Centraliza o título
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        CardOrdemServico(ordemServico, clienteNome ?: "", produtoNome ?: "", funcionarioNome ?: "")
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextFieldWithSpacing(
+            value = desconto,
+            onValueChange = { desconto = it },
+            label = "Desconto",
+            keyboardType = KeyboardType.Number
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        ReadOnlyTextFieldWithSpacing(value = valorAPagar, label = "Valor A Pagar")
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(onClick = {
+            val descontoFinal = if(desconto.isBlank()) 0f else desconto.toFloat()
+
+            if(descontoFinal > 0 && descontoFinal < valorAPagar.toFloat()){
+                val retorno = ordemServicoViewModel.solicitarBaixa(ordemServico.id, descontoFinal)
+                Toast.makeText(context, retorno, Toast.LENGTH_LONG).show()
+
+                navController.popBackStack()
+                navController.popBackStack()
+            }else{
+                Toast.makeText(context, "Valor de desconto incorreto!", Toast.LENGTH_LONG).show()
+            }
+        }) {
+            Text("Solicitar a Baixa")
         }
     }
 }
