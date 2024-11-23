@@ -44,7 +44,7 @@ Criação da O.S --> Solicitação de baixa --> Autorização da solicitação.
 O fluxo de funcionamento do aplicativo segue uma sequência de etapas para garantir o correto gerenciamento de ordens de serviço, desde o cadastro até a finalização da entrega. Abaixo, explicamos cada uma das etapas:
 
 ## 1. Cadastro de Cliente
-Para iniciar o processo, é necessário cadastrar pelo menos um cliente. Este cliente será vinculado à ordem de serviço.
+Para iniciar o processo, é necessário cadastrar pelo menos um cliente. Este cliente será vinculado à ordem de serviço, um dos requisitos de avaliação é um campo de busca que foi implementado da lista de clientes.
 
 ## 2. Cadastro de Funcionário
 Em seguida, é necessário cadastrar pelo menos um funcionário. Os funcionários serão responsáveis pela execução das etapas da ordem de serviço e devem ser vinculados ao processo para controle de atividades.
