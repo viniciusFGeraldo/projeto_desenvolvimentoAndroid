@@ -38,7 +38,7 @@ Criação da O.S --> Solicitação de baixa --> Autorização da solicitação.
 1. Clone o repositório:  
    ```bash
    git clone https://github.com/viniciusFGeraldo/projeto_desenvolvimentoAndroid.git
-#--------------------------------------------------------------------------------------
+---
 # Fluxo de Teste do App
 
 O fluxo de funcionamento do aplicativo segue uma sequência de etapas para garantir o correto gerenciamento de ordens de serviço, desde o cadastro até a finalização da entrega. Abaixo, explicamos cada uma das etapas:
