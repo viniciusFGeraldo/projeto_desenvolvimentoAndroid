@@ -9,6 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -157,10 +158,11 @@ fun TelaInicial(navController: NavController) {
         Text(
             text = "Menu Principal",
             style = MaterialTheme.typography.h4.copy(
-                color = Color(0xFF3C3B6F),  // Cor do texto do título
+                color = Color(0xFF000000),  // Cor do texto do título
                 fontWeight = FontWeight.Bold
             )
         )
+
         // Botão Menu de Cadastros
         Button(
             onClick = { navController.navigate("menuCadastros") },
@@ -168,15 +170,16 @@ fun TelaInicial(navController: NavController) {
                 .fillMaxWidth()
                 .padding(8.dp), // Espaçamento entre os botões
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF546BB0), // Cor de fundo roxa
-                contentColor = Color.White // Cor do texto
+                containerColor = Color.White, // Cor de fundo branco
+                contentColor = Color(0xFF3D64FB) // Cor do texto (azul)
             ),
             shape = RoundedCornerShape(12.dp), // Bordas arredondadas
-            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+            border = BorderStroke(2.dp, Color(0xFF3D64FB)) // Borda azul
         ) {
             Text(
                 text = "Menu de Cadastros",
-                style = MaterialTheme.typography.h6.copy(color = Color.White)
+                style = MaterialTheme.typography.h6.copy(color = Color(0xFF3D64FB)) // Cor do texto azul
             )
         }
 
@@ -187,23 +190,28 @@ fun TelaInicial(navController: NavController) {
                 .fillMaxWidth()
                 .padding(8.dp),  // Espaçamento entre os botões
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF546BB0), // Cor de fundo verde-água
-                contentColor = Color.Black // Cor do texto
+                containerColor = Color.White, // Cor de fundo branco
+                contentColor = Color(0xFF3D64FB) // Cor do texto (azul)
             ),
             shape = RoundedCornerShape(12.dp), // Bordas arredondadas
-            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+            border = BorderStroke(2.dp, Color(0xFF3D64FB)) // Borda azul
         ) {
             Text(
                 text = "Ordens de Serviço",
-                style = MaterialTheme.typography.h6.copy(color = Color.White)
+                style = MaterialTheme.typography.h6.copy(color = Color(0xFF3D64FB)) // Cor do texto azul
             )
         }
     }
 }
 
-
 @Composable
-fun MenuCadastros(navController: NavController, acabamentoViewModel: AcabamentoViewModel, equipamentoViewModel: EquipamentoViewModel, context: Context) {
+fun MenuCadastros(
+    navController: NavController,
+    acabamentoViewModel: AcabamentoViewModel,
+    equipamentoViewModel: EquipamentoViewModel,
+    context: Context
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -215,7 +223,7 @@ fun MenuCadastros(navController: NavController, acabamentoViewModel: AcabamentoV
         Text(
             text = "Menu de Cadastros",
             style = MaterialTheme.typography.h4.copy(
-                color = Color(0xFF3C3B6F),  // Cor do texto do título
+                color = Color(0xFF000000),  // Cor do texto do título
                 fontWeight = FontWeight.Bold
             )
         )
@@ -227,15 +235,16 @@ fun MenuCadastros(navController: NavController, acabamentoViewModel: AcabamentoV
                 .fillMaxWidth()
                 .padding(8.dp),  // Espaçamento entre os botões
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF546BB0), // Cor de fundo do botão
-                contentColor = Color.White // Cor do texto
+                containerColor = Color.White, // Cor de fundo branco
+                contentColor = Color(0xFF3D64FB) // Cor do texto (azul)
             ),
             shape = RoundedCornerShape(12.dp), // Bordas arredondadas
-            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+            border = BorderStroke(2.dp, Color(0xFF3D64FB)) // Borda azul
         ) {
             Text(
                 text = "Acabamento",
-                style = MaterialTheme.typography.h6.copy(color = Color.White)
+                style = MaterialTheme.typography.h6.copy(color = Color(0xFF3D64FB)) // Cor do texto azul
             )
         }
 
@@ -246,15 +255,16 @@ fun MenuCadastros(navController: NavController, acabamentoViewModel: AcabamentoV
                 .fillMaxWidth()
                 .padding(8.dp),  // Espaçamento entre os botões
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF546BB0), // Cor de fundo do botão
-                contentColor = Color.White // Cor do texto
+                containerColor = Color.White, // Cor de fundo branco
+                contentColor = Color(0xFF3D64FB) // Cor do texto (azul)
             ),
             shape = RoundedCornerShape(12.dp), // Bordas arredondadas
-            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+            border = BorderStroke(2.dp, Color(0xFF3D64FB)) // Borda azul
         ) {
             Text(
                 text = "Clientes",
-                style = MaterialTheme.typography.h6.copy(color = Color.White)
+                style = MaterialTheme.typography.h6.copy(color = Color(0xFF3D64FB)) // Cor do texto azul
             )
         }
 
@@ -265,15 +275,16 @@ fun MenuCadastros(navController: NavController, acabamentoViewModel: AcabamentoV
                 .fillMaxWidth()
                 .padding(8.dp),  // Espaçamento entre os botões
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF546BB0), // Cor de fundo do botão
-                contentColor = Color.White // Cor do texto
+                containerColor = Color.White, // Cor de fundo branco
+                contentColor = Color(0xFF3D64FB) // Cor do texto (azul)
             ),
             shape = RoundedCornerShape(12.dp), // Bordas arredondadas
-            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+            border = BorderStroke(2.dp, Color(0xFF3D64FB)) // Borda azul
         ) {
             Text(
                 text = "Equipamentos",
-                style = MaterialTheme.typography.h6.copy(color = Color.White)
+                style = MaterialTheme.typography.h6.copy(color = Color(0xFF3D64FB)) // Cor do texto azul
             )
         }
 
@@ -284,45 +295,47 @@ fun MenuCadastros(navController: NavController, acabamentoViewModel: AcabamentoV
                 .fillMaxWidth()
                 .padding(8.dp),  // Espaçamento entre os botões
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF546BB0), // Cor de fundo do botão
-                contentColor = Color.White // Cor do texto
+                containerColor = Color.White, // Cor de fundo branco
+                contentColor = Color(0xFF3D64FB) // Cor do texto (azul)
             ),
             shape = RoundedCornerShape(12.dp), // Bordas arredondadas
-            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+            border = BorderStroke(2.dp, Color(0xFF3D64FB)) // Borda azul
         ) {
             Text(
                 text = "Funcionários",
-                style = MaterialTheme.typography.h6.copy(color = Color.White)
+                style = MaterialTheme.typography.h6.copy(color = Color(0xFF3D64FB)) // Cor do texto azul
             )
         }
 
         // Botão Cadastro de Produtos
         Button(
             onClick = {
-                    if(acabamentoViewModel.listaAcabamentos.value.isEmpty() || equipamentoViewModel.listaEquipamentos.value.isEmpty()){
-                        Toast.makeText(context, "Primeiro cadastre pelo menos um equipamento e um acabamento antes de acessar essa página", Toast.LENGTH_LONG).show()
-                    }else{
-                        navController.navigate("listaProdutos")
-                    }
-                },
+                if (acabamentoViewModel.listaAcabamentos.value.isEmpty() || equipamentoViewModel.listaEquipamentos.value.isEmpty()) {
+                    Toast.makeText(context, "Primeiro cadastre pelo menos um equipamento e um acabamento antes de acessar essa página", Toast.LENGTH_LONG).show()
+                } else {
+                    navController.navigate("listaProdutos")
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),  // Espaçamento entre os botões
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF546BB0), // Cor de fundo do botão
-                contentColor = Color.White // Cor do texto
+                containerColor = Color.White, // Cor de fundo branco
+                contentColor = Color(0xFF3D64FB) // Cor do texto (azul)
             ),
             shape = RoundedCornerShape(12.dp), // Bordas arredondadas
-            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+            border = BorderStroke(2.dp, Color(0xFF3D64FB)) // Borda azul
         ) {
             Text(
                 text = "Produtos",
-                style = MaterialTheme.typography.h6.copy(color = Color.White)
+                style = MaterialTheme.typography.h6.copy(color = Color(0xFF3D64FB)) // Cor do texto azul
             )
         }
     }
-
 }
+
 
 @Composable
 fun BackButton(onClick:()->Unit) {

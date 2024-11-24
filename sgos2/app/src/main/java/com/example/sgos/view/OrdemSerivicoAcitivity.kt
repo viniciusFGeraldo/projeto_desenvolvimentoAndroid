@@ -1,6 +1,7 @@
 package com.example.sgos.view
 
 import android.content.Context
+import android.text.style.BackgroundColorSpan
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,10 +16,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -28,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -90,48 +96,62 @@ fun ListaOrdemServico(
         Spacer(modifier = Modifier.height(30.dp))
 
         LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            item{
-                Row (
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-                    BackButton(onClick = {navController.popBackStack()})
+            item {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    BackButton(onClick = { navController.popBackStack() })
 
-                    Text(text = "${if(modoSolicitacaoBaixa) "Lista de Solicitações de Baixa" else "Lista de Ordem de Serviço"} ",
+                    Text(
+                        text = "${if (modoSolicitacaoBaixa) "Lista de Solicitações de Baixa" else "Lista de Ordem de Serviço"} ",
                         modifier = Modifier.fillMaxWidth(),
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1A1A1A))
+                        color = Color.Black // Usando o vermelho para destacar o título
+                    )
                 }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                Row(modifier = Modifier.fillMaxWidth()) {
                     if (!modoSolicitacaoBaixa) {
                         Spacer(modifier = Modifier.weight(0.3f))
 
-                        Button(onClick = { navController.navigate("listaSolicitacoesBaixa") }, modifier = Modifier.weight(2f)) {
-                            Text("Solicitações de Baixas")
+                        Button(
+                            onClick = { navController.navigate("listaSolicitacoesBaixa") },
+                            modifier = Modifier.weight(2f),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF084F8C)),
+                            shape = RoundedCornerShape(4.dp)
+
+                        ) {
+                            Text("Solicitações Baixas", color = Color.White) // Texto branco sobre fundo azul
                         }
 
                         Spacer(modifier = Modifier.weight(0.3f))
 
                         Button(
                             onClick = {
-                                if(listaClientes.isEmpty() || listaFuncionarios.isEmpty() || listaProdutos.isEmpty()){
-                                    Toast.makeText(context, "Primeiro faça cadastro de pelo menos um: cliente, funcionário e produto para acessar essa página", Toast.LENGTH_LONG).show()
-                                }else {
+                                if (listaClientes.isEmpty() || listaFuncionarios.isEmpty() || listaProdutos.isEmpty()) {
+                                    Toast.makeText(
+                                        context,
+                                        "Primeiro faça cadastro de pelo menos um: cliente, funcionário e produto para acessar essa página",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                } else {
                                     navController.navigate("cadastroOrdemServico")
                                 }
                             },
-                            modifier = Modifier.weight(1.5f)) {
-                            Text("Cadastrar")
+                            modifier = Modifier.weight(1.5f),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color
+                                (0xFF198754)),
+                            shape = RoundedCornerShape(4.dp)
+
+                        ) {
+                            Text("Cadastrar", color = Color.White) // Texto preto sobre fundo amarelo
+
                         }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                if((!modoSolicitacaoBaixa && listaOrdemServico.none { it.status != Status.SOLICITADO_BAIXA }) || (modoSolicitacaoBaixa && listaOrdemServico.none { it.status == Status.SOLICITADO_BAIXA })){
+                if ((!modoSolicitacaoBaixa && listaOrdemServico.none { it.status != Status.SOLICITADO_BAIXA }) || (modoSolicitacaoBaixa && listaOrdemServico.none { it.status == Status.SOLICITADO_BAIXA })) {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -139,18 +159,15 @@ fun ListaOrdemServico(
                         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
 
                     ) {
-                        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally)
-                        {
-                            Text(text = "Não há nenhuma ordem de serviço ${if(modoSolicitacaoBaixa) "que foi solicitado baixa" else "cadastrada"}", fontSize = 20.sp)
+                        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(text = "Não há nenhuma ordem de serviço ${if (modoSolicitacaoBaixa) "que foi solicitado baixa" else "cadastrada"}", fontSize = 20.sp, color = Color.Black)
                         }
                     }
                 }
             }
 
             items(listaOrdemServico) { ordemServico ->
-                if ((!modoSolicitacaoBaixa && ordemServico.status != Status.SOLICITADO_BAIXA) ||
-                    (modoSolicitacaoBaixa && ordemServico.status == Status.SOLICITADO_BAIXA)
-                ) {
+                if ((!modoSolicitacaoBaixa && ordemServico.status != Status.SOLICITADO_BAIXA) || (modoSolicitacaoBaixa && ordemServico.status == Status.SOLICITADO_BAIXA)) {
                     val cliente = listaClientes.find { it.id == ordemServico.clienteId }
                     val funcionario = listaFuncionarios.find { it.id == ordemServico.funcionarioId }
                     val produto = listaProdutos.find { it.id == ordemServico.produtoId }
@@ -159,9 +176,7 @@ fun ListaOrdemServico(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 8.dp),
-                        elevation = CardDefaults.cardElevation(
-                            defaultElevation = 4.dp
-                        ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                         onClick = {
                             navController.navigate("mostrarInformacaoOS/${ordemServico.id}")
                         }
@@ -174,21 +189,22 @@ fun ListaOrdemServico(
                         ) {
                             Text(
                                 text = "Ordem de Serviço: ${ordemServico.id}",
-                                style = MaterialTheme.typography.headlineSmall
+                                style = MaterialTheme.typography.headlineSmall,
+                                color = Color.Black // Azul para o título da ordem de serviço
                             )
                             cliente?.let {
-                                Text(text = "Cliente: ${it.nome}", style = MaterialTheme.typography.bodySmall)
+                                Text(text = "Cliente: ${it.nome}", style = MaterialTheme.typography.bodySmall, color = Color.Black)
                             }
                             funcionario?.let {
-                                Text(text = "Funcionário: ${it.nome}", style = MaterialTheme.typography.bodySmall)
+                                Text(text = "Funcionário: ${it.nome}", style = MaterialTheme.typography.bodySmall, color = Color.Black)
                             }
                             produto?.let {
-                                Text(text = "Produto: ${it.nome}", style = MaterialTheme.typography.bodySmall)
+                                Text(text = "Produto: ${it.nome}", style = MaterialTheme.typography.bodySmall, color = Color.Black)
                             }
                             Text(
                                 text = "Status: ${ordemServico.status}",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.secondary
+                                // Verde para indicar um status positivo (aqui pode ser personalizado)
                             )
                         }
                     }
@@ -197,6 +213,7 @@ fun ListaOrdemServico(
         }
     }
 }
+
 
 @Composable
 fun FormOrdemServico(
@@ -254,8 +271,10 @@ fun FormOrdemServico(
 
         var expandedCliente by remember { mutableStateOf(false) }
 
-        OutlinedButton(onClick = { expandedCliente = true }, modifier = Modifier.fillMaxWidth()) {
-            Text(clienteSelecionado?.nome ?: "Selecione um Cliente")
+        OutlinedButton(onClick = { expandedCliente = true }, modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(4.dp) // Bordas arredondadas com raio de 16 dp
+        ) {
+            Text(clienteSelecionado?.nome ?: "Selecione um Cliente",color = Color(0xFF000000))
         }
 
         Box(modifier = Modifier.fillMaxWidth()) {
@@ -275,13 +294,16 @@ fun FormOrdemServico(
                 }
             }
         }
+        Spacer(modifier = Modifier.height(6.dp))
 
         // Funcionário
         var expandedFuncionario by remember { mutableStateOf(false) }
 
         Box(modifier = Modifier.fillMaxWidth()) {
-            OutlinedButton(onClick = { expandedFuncionario = true }, modifier = Modifier.fillMaxWidth()) {
-                Text(funcionarioSelecionado?.nome ?: "Selecione um Funcionario")
+            OutlinedButton(onClick = { expandedFuncionario = true }, modifier = Modifier
+                .fillMaxWidth(),shape = RoundedCornerShape(4.dp)) {
+                Text(funcionarioSelecionado?.nome ?: "Selecione um Funcionario",color = Color
+                    (0xFF000000))
             }
             DropdownMenu(
                 modifier = Modifier.fillMaxWidth(),
@@ -299,13 +321,15 @@ fun FormOrdemServico(
                 }
             }
         }
+        Spacer(modifier = Modifier.height(6.dp))
 
         // Produto
         var expadedProduto by remember { mutableStateOf(false) }
 
         Box(modifier = Modifier.fillMaxWidth()) {
-            OutlinedButton(onClick = { expadedProduto = true }, modifier = Modifier.fillMaxWidth()) {
-                Text(produtoSelecionado?.nome ?: "Selecione um Produto")
+            OutlinedButton(onClick = { expadedProduto = true }, modifier = Modifier.fillMaxWidth
+                (), shape = RoundedCornerShape(4.dp)) {
+                Text(produtoSelecionado?.nome ?: "Selecione um Produto",color = Color(0xFF000000))
             }
             DropdownMenu(
                 modifier = Modifier.fillMaxWidth(),
@@ -324,7 +348,7 @@ fun FormOrdemServico(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(6.dp))
 
         // Campos numéricos
         OutlinedTextFieldWithSpacing(
@@ -410,7 +434,8 @@ fun FormOrdemServico(
                     navController.popBackStack()
                 }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
         ) {
             Text(text = if (modoEditar) "Salvar Alterações" else "Cadastrar Ordem de Serviço")
         }
@@ -580,7 +605,9 @@ fun MostrarInformacaoOS(
                     Button(modifier = Modifier.weight(1.5f),
                         onClick = {
                             ordemServicoViewModel.atualizarStatus(ordemServico)
-                        }) {
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF006400))
+                        ) {
                         Text("Confirmar Baixa")
                     }
                 }
