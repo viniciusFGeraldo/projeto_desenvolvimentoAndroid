@@ -111,7 +111,6 @@ fun ListaOrdemServico(
 
                 Row(modifier = Modifier.fillMaxWidth()) {
                     if (!modoSolicitacaoBaixa) {
-                        Spacer(modifier = Modifier.weight(0.3f))
 
                         Button(
                             onClick = { navController.navigate("listaSolicitacoesBaixa") },
